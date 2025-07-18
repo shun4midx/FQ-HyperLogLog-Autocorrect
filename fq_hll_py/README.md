@@ -41,7 +41,7 @@ if __name__ == "__main__":
     ans6 = ac.top3(["tsetign", "hillo", "goobye", "haedhpoesn"])
 
     # You can even have a custom dictionary!
-    dictionary = ["apple", "banana", "grape", "orange"]
+    dictionary = ["apple", "banana", "grape", "orange"] # Note that this dictionary would be treated as if it's from most to least frequently used
     custom_ac = Autocorrector(dictionary)
 
     ans7 = custom_ac.autocorrect(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
