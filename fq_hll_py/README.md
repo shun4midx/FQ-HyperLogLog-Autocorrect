@@ -61,8 +61,8 @@ compare_files(suggestions, typos, answers)
 or if we are doing Top 3 words selected per row,
 
 ```py
-> from fq_hll import compare3
-> compare3_files(suggestions, typos, answers)
+from fq_hll import compare3
+compare3_files(suggestions, typos, answers)
 ```
 
 Of course, `fq_hll` can be replaced with `dyslexicloglog` here too, depending on which version you install.
