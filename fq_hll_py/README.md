@@ -4,7 +4,7 @@ First make sure you can use `pip install`. If not, please install it [here](http
 Then, either do 
 
 ```py
-pip install fq-hll
+pip install fq_hll
 ```
 
 or
