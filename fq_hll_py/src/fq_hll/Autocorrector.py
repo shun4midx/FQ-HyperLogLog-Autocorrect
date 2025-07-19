@@ -28,7 +28,7 @@ def extract_qgrams(word, q=2, swap=False):
         return qgrams
 
 # ======== REPACKAGING ======== #
-def load_words(src, return_display=True):
+def load_words(src):
     """
     src: either
       * a list/tuple of words
@@ -46,7 +46,7 @@ def load_words(src, return_display=True):
             raw = [line.strip() for line in f if line.strip()]
 
     # 3) String?
-    elif isinstance(src, str) and not return_display:
+    elif isinstance(src, str):
         return [src]
 
     else:
@@ -55,11 +55,8 @@ def load_words(src, return_display=True):
     # now raw is a list of original words
     words = [word.lower() for word in raw]
 
-    if return_display:
-        display = {word.lower(): word for word in raw}
-        return words, display
-    else:
-        return words
+    display = {word.lower(): word for word in raw}
+    return words, display
 
 class Autocorrector:
     def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), *, alpha=0.3, b=10):
@@ -128,7 +125,7 @@ class Autocorrector:
         if print_times:
             self.save_dictionary(True)
 
-        queries = load_words(queries_list, return_display=False)
+        queries, query_displays = load_words(queries_list)
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -166,7 +163,7 @@ class Autocorrector:
             if not cand_idxs:
                 if print_details:
                     print("  -> no overlaps; returning empty")
-                suggestions[query] = ""
+                suggestions[query_displays[query]] = ""
                 output.append("")
                 continue
 
@@ -207,7 +204,7 @@ class Autocorrector:
                 print("-" * 30)
 
             displayed_picked = self.display_map.get(picked, picked)
-            suggestions[query] = displayed_picked
+            suggestions[query_displays[query]] = displayed_picked
             output.append(displayed_picked)
 
         # 4) Write out
@@ -232,7 +229,7 @@ class Autocorrector:
         if print_times:
             self.save_dictionary(True)
 
-        queries = load_words(queries_list, return_display=False)
+        queries, query_display = load_words(queries_list)
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -271,7 +268,7 @@ class Autocorrector:
                 if print_details:
                     print("  -> no overlaps; returning empty")
                 output.append("")
-                suggestions[query] = ["", "", ""]
+                suggestions[query_display[query]] = ["", "", ""]
                 continue
 
             # d) Compute Jaccard & Zipf score R for each candidate
@@ -297,7 +294,7 @@ class Autocorrector:
                 print(f"{query:>12} -> top 3: {top3}")
                 print("-" * 30)
 
-            suggestions[query] = top3
+            suggestions[query_display[query]] = top3
             output.append(" ".join(top3))
 
         # 4) Write out
