@@ -133,7 +133,8 @@ class Autocorrector:
         # 3) Process queries
         self.t2 = time.perf_counter()
 
-        suggestions = []
+        output = []
+        suggestions = {} # Dictionary
 
         for query in queries:
             # Print fuzzy HLL estimates per gram
@@ -165,7 +166,8 @@ class Autocorrector:
             if not cand_idxs:
                 if print_details:
                     print("  -> no overlaps; returning empty")
-                suggestions.append("")
+                suggestions[query] = ""
+                output.append("")
                 continue
 
             # d) Compute Jaccard & Zipf score R for each candidate
@@ -204,14 +206,16 @@ class Autocorrector:
                     f"  (J={J[best_idx]}, score={best_score})")
                 print("-" * 30)
 
-            suggestions.append(self.display_map.get(picked, picked))
+            displayed_picked = self.display_map.get(picked, picked)
+            suggestions[query] = displayed_picked
+            output.append(displayed_picked)
 
         # 4) Write out
         self.t3 = time.perf_counter()
 
         if output_file != "None":
             with open(output_file, "w") as out:
-                out.write("\n".join(suggestions))
+                out.write("\n".join(output))
 
         # 5) Output time elapsed
         self.end_total = time.perf_counter()
@@ -233,7 +237,8 @@ class Autocorrector:
         # 3) Process queries
         self.t2 = time.perf_counter()
 
-        suggestions = []
+        output = [] # Output
+        suggestions = {} # Dictionary
 
         for query in queries:
             # Print fuzzy HLL estimates per gram
@@ -265,7 +270,8 @@ class Autocorrector:
             if not cand_idxs:
                 if print_details:
                     print("  -> no overlaps; returning empty")
-                suggestions.append("")
+                output.append("")
+                suggestions[query] = ["", "", ""]
                 continue
 
             # d) Compute Jaccard & Zipf score R for each candidate
@@ -291,13 +297,14 @@ class Autocorrector:
                 print(f"{query:>12} -> top 3: {top3}")
                 print("-" * 30)
 
-            suggestions.append(" ".join(top3))
+            suggestions[query] = top3
+            output.append(" ".join(top3))
 
         # 4) Write out
         self.t3 = time.perf_counter()
         if output_file != "None":
             with open(output_file, "w") as out:
-                out.write("\n".join(suggestions))
+                out.write("\n".join(output))
 
         # 5) Output time elapsed
         self.end_total = time.perf_counter()
@@ -329,7 +336,7 @@ if __name__ == "__main__":
     ans5 = ac.autocorrect(["tsetign", "hillo", "goobye", "haedhpoesn"])
     ans6 = ac.top3(["tsetign", "hillo", "goobye", "haedhpoesn"])
 
-    # You can even have a custom dictionary!
+    # # You can even have a custom dictionary!
     dictionary = ["apple", "banana", "grape", "orange"]
     custom_ac = Autocorrector(dictionary)
 
