@@ -14,6 +14,8 @@ Now, you can use the library!
 ## Usage
 The library defaults to searching within its own folder before searching in your local directory. There are two text files offered as base dictionaries: `20k_shun4midx.txt` and `database.txt`, with around 20000 and 400 words respectively. The below code would only visit the local directory. If no dictionary is specified, `20k_shun4midx.txt` would be used instead.
 
+What is returned is in the form of a list of strings.
+
 ```py
 # ======== SAMPLE USAGE ======== #
 from fq_hll import Autocorrector # Or "from dyslexicloglog import Autocorrector", just choose the one you installed

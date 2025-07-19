@@ -5,10 +5,6 @@
 # File: fq_hll_test.py                     #
 ############################################
 
-import sys, os
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'src', 'fq-hll'))
-sys.path.insert(0, root)
-
 from fq_hll import Autocorrector, compare_files, compare3_files
 
 if __name__ == "__main__":
