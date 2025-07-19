@@ -6,7 +6,7 @@ An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library
 ## Usage
 The library defaults to searching within its own folder before searching in your local directory. Visit my [GitHub Repo](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect) for more details, but there are two text files offered as base dictionaries: `20k_shun4midx.txt` and `database.txt`, with around 20000 and 400 words respectively. The below code would only visit the local directory. If no dictionary is specified, `20k_shun4midx.txt` would be used instead.
 
-What is returned is in the form of a list of strings.
+What is returned is in the form of a dictionary, mapping each query to either a single string for `autocorrect` or a list of three strings for `top3`. 
 
 ```py
 # ======== SAMPLE USAGE ======== #
