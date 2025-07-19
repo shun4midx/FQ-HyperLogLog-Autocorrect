@@ -28,7 +28,15 @@ In the end, dictionary list `database.txt` performed consistently at around **87
 
 For context, I implemented the standard Levenshtein + BK-Tree autocorrection algorithm with **edit distance <= 2** (Since otherwise it would be more than five times slower than FQ-HLL) in `fq_hll_py/tests/bk_test.py`, and it performs slower but also at a lower accuracy, at around **75~76%** and **43~44%** respectively. I even increased the **edit distance to be <= 3**, and allowed the program to be exponentially slower. Even then, its accuracy only achieves around **89~90%** and **46~47%** respectively, undoubtedly it uses more memory too. The accuracy doesn't increase much after edit distance is greater than 3.
 
-Even for **`SymSpell`** in `fq_hll_py/tests/symspell_test.py`, I increased to **edit distance <= 5**, and even then its accuracy was only around **89~90%** and **46~47%** respectively. 
+Even for **`SymSpell`** in `fq_hll_py/tests/symspell_test.py`, I increased to **edit distance <= 5**, and even then its accuracy was only around **89~90%** and **46~47%** respectively.
+
+In `Python`, here is a rough total runtime of each algorithm to finish all queries:
+| Method        | `database.txt`      | `20k_shun4midx.txt` |
+| ------------- | ------------------- | ------------------- |
+| FQ-HLL        | 0.223s              | 9.955s              |
+| BK (ED <= 2)  | 2.126s              | 46.028s             |
+| BK (ED <= 3)  | 3.816s              | 92.812s             |
+| SymSpell      | 0.515s + 0.996s     | 16.994s + 29.355s   | <- Build + Query time
 
 Given the relatively small memory usage yet huge accuracy and its potential to have LDP, FQ-HLL is something worth considering for autocorrection algorithms.
 
