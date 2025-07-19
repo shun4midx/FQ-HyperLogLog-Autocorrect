@@ -2,7 +2,7 @@
 # Copyright (c) 2025 Shun/翔海 (@shun4midx) #
 # Project: FQ-HyperLogLog-Autocorrect      #
 # File Type: Python file                   #
-# File: Hasher.py                         #
+# File: Hasher.py                          #
 ############################################
 
 import struct
