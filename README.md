@@ -9,6 +9,7 @@ An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library base
 - [Results](#results)
 - [Notes](#notes)
 - [Plans](#plans-for-the-repo)
+- [Usage](#current-repos-using-this-fq-hll-library)
 
 ## Context
 For context, we did Autocorrection for our final project, and I was tasked to design an Autocorrection algorithm using HLL. HLL demonstrated decent performance (accuracy, speed, and memory) compared to the [baseline](https://arxiv.org/pdf/2208.05264) with preliminary trials, but in our evaluation, we realized the way our algorithm didn't give HLL a fair chance. 
@@ -26,7 +27,7 @@ Here, for the most objective measure, I counted "accuracy" as simply if the word
 
 In the end, dictionary list `database.txt` performed consistently at around **87~88%** accuracy and `20k_shun4midx.txt` at around **59~60%** accuracy. For the `top3` results, it was consistently at around **94~95%** and **75~76%** respectively.
 
-For context, I implemented the standard Levenshtein + BK-Tree autocorrection algorithm with **edit distance <= 2** (Since otherwise it would be more than five times slower than FQ-HLL) in `fq_hll_py/tests/bk_test.py`, and it performs slower but also at a lower accuracy, at around **75~76%** and **43~44%** respectively. I even increased the **edit distance to be <= 3**, and allowed the program to be exponentially slower. Even then, its accuracy only achieves around **89~90%** and **46~47%** respectively, undoubtedly it uses more memory too. The accuracy doesn't increase much after edit distance is greater than 3.
+For context, I implemented the standard Levenshtein + BK-Tree autocorrection algorithm with **edit distance <= 2** (Since otherwise it would be more than five times slower than FQ-HLL) in `fq_hll_py/tests/bk_test.py`, and it performs slower but also at a lower accuracy, at around **75~76%** and **43~44%** respectively. I even increased the **edit distance to be <= 3**, and allowed the program to be slower. Even then, its accuracy only achieves around **89~90%** and **46~47%** respectively, undoubtedly it uses more memory too. The accuracy doesn't increase much after edit distance is greater than 3.
 
 Even for **`SymSpell`** in `fq_hll_py/tests/symspell_test.py`, I increased to **edit distance <= 5**, and even then its accuracy was only around **89~90%** and **46~47%** respectively.
 
@@ -56,3 +57,6 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - [Maybe] Include a C++ library too that is importable via CMake, since as most of you know, I love C++.
  - Formally document the logic behind the algorithm via a LaTeX file (or its PDF directly).
  - If time permits, I may include a formal proof of FQ-HLL, the FQ-HLL algorithm's validity, and potential developments in LDP.
+
+## Current Repos using this FQ-HLL Library
+ - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
