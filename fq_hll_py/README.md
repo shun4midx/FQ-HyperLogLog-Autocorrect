@@ -3,15 +3,11 @@ First make sure you can use `pip install`. If not, please install it [here](http
 
 Then, either do 
 
-```py
-pip install fq_hll
-```
+`pip install fq-hll`
 
 or
 
-```py
-pip install DyslexicLogLog
-```
+`pip install DyslexicLogLog`
 
 Now, you can use the library!
 
