@@ -9,11 +9,9 @@ import math
 from .Hasher import str_to_u64
 
 class SketchConfig:
-    def __init__(self, b=10, use_bias_correction=True, alpha_override=-1.0, epsilon=4.0):
+    def __init__(self, b=10, alpha_override=-1.0):
         self.b = b
-        self.use_bias_correction = use_bias_correction
         self.alpha_override = alpha_override
-        self.epsilon = epsilon
         self.mask = (1 << (64 - self.b)) - 1
 
 class HyperLogLog:
