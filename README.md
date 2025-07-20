@@ -60,3 +60,4 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
 
 ## Current Repos using this FQ-HLL Library
  - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
+ - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs.
