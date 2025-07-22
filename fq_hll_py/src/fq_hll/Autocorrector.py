@@ -80,7 +80,7 @@ class Autocorrector:
 
         self.save_dictionary() # Don't have to recompute every time
 
-    def save_dictionary(self, print_times=False):
+    def save_dictionary(self):
         self.start_total = time.perf_counter()
         self.t0 = time.perf_counter()
 
@@ -123,7 +123,7 @@ class Autocorrector:
 
     def autocorrect(self, queries_list, output_file="None", print_details=False, print_times=False):
         if print_times:
-            self.save_dictionary(True)
+            self.save_dictionary()
 
         queries, query_displays = load_words(queries_list)
 
