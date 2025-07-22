@@ -53,6 +53,18 @@ if __name__ == "__main__":
     print(ans8)
 ```
 
+There is also a mode for texting, which combines the `texting.txt` file here underneath the `20k_shun4midx.txt` file, when ranked according to frequency. You could simply call the following command instead of simply `ac = Autocorrector()` to use this combined dictionary:
+
+```cmd
+ac = Autocorrector("texting")
+```
+
+Although I would **NOT modify** the `20k_shun4midx.txt` file, if you use the `texting.txt` file and notice some words you commonly use when texting are missing and you want to include it, feel free to contact me (via [Email](mailto:shun4midx@gmail.com) or Discord at @shun4midx) and I will consider including it in the file. For context, words like "lol" and "omg" are already in the original `20k_shun4midx.txt` file, so please check if it is in the `20k_shun4midx.txt` file before contacting me.
+
+The words in the `texting.txt` file are not compiled from any online source. They simply are based on commonly used texting words I observe from personally texting my friends, so they may be more biased to match my demographic. 
+
+If you have any suggestions of other categories of words to add other than texting, feel free to let me know. I may consider creating the category to be just as usable as the texting file.
+
 As a side note, `compare.py` and `compare3.py`, as [files](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py/src/fq_hll) that are quite useful for comparing between intended outputs and actual outputs, can be used via 
 
 ```py

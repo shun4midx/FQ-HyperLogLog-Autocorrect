@@ -58,12 +58,33 @@ def load_words(src):
     display = {word.lower(): word for word in raw}
     return words, display
 
+addon_files = ["texting"] # Files to addon 20k_shun4midx.txt
+
 class Autocorrector:
     def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), *, alpha=0.3, b=10):
         if isinstance(dictionary_list, list):
             # If a list is provided, use it directly
             self.word_dict = dictionary_list
             self.display_map = {word: word for word in dictionary_list}
+        elif dictionary_list in addon_files:
+            # Read both 20k_shun4midx and the addon_file
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            base_path = os.path.join(base_dir, "test_files", "20k_shun4midx.txt")
+            addon_path = os.path.join(base_dir, "test_files", dictionary_list + ".txt")
+
+            new_dict = []
+
+            with open(base_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.strip():
+                        new_dict.append(line.strip())
+
+            with open(addon_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.strip():
+                        new_dict.append(line.strip())
+
+            self.word_dict, self.display_map = load_words(new_dict)
         elif os.path.isfile(dictionary_list):
             # If a file path is provided, load the dictionary from the file
             dictionary_path = os.path.abspath(dictionary_list)
