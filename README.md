@@ -9,7 +9,7 @@ An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library base
 - [Results](#results)
 - [Notes](#notes)
 - [Plans](#plans-for-the-repo)
-- [Usage](#current-repos-using-this-fq-hll-library)
+- [Current Usages](#current-repos-using-this-fq-hll-library)
 
 ## Context
 For context, we did Autocorrection for our final project, and I was tasked to design an Autocorrection algorithm using HLL. HLL demonstrated decent performance (accuracy, speed, and memory) compared to the [baseline](https://arxiv.org/pdf/2208.05264) with preliminary trials, but in our evaluation, we realized the way our algorithm didn't give HLL a fair chance. 
@@ -18,7 +18,7 @@ After the semester, I doubt my team members have much interest, but I still have
 
 **For theoretical value, there is nothing in my algorithm that uses any information about the English language or the QWERTY keyboard, to do any of the corrections. It is a NON-ML algorithm too.**
 
-## Results (For runtime/memory specific results, visit the README files of the desired language please)
+## Results
 I've referenced [a list of common typos in datasets from Peter Norvig's classic spelling corrector](https://www.kaggle.com/datasets/bittlingmayer/spelling/data), which I should call the `typo_file.txt`, and used FQ-HLL with two different sets of base "dictionary words". As I don't have access to the correct words in `typo_file.txt`'s relative frequencies, I simply put all the corresponding words in the order as they were given, and put it in a set of dictionary words: `database.txt`. 
 
 The other set was comprised of the [most commonly used 20000 English words](https://github.com/first20hours/google-10000-english/blob/master/20k.txt) on top, and the original words from `database.txt` on the bottom, since I needed to include all possible answers in the dictionary. I put them at the end to disadvantage them as much as possible, to be seen as least frequent. This is called `20k_shun4midx.txt`.
@@ -60,4 +60,5 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
 
 ## Current Repos using this FQ-HLL Library
  - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
- - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs.
+ - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
+ - [Python] A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
