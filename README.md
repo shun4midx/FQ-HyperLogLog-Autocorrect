@@ -2,7 +2,7 @@
 
 ## NOTE: Specific details on how to run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately
 
-An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library based on my final project in **Advanced Data Structures 2025**, with credit to my team members at the time. For their respect of privacy, I would keep them anonymous, unless they request otherwise.
+An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library based on my final project in **Advanced Data Structures 2025**, with credit to my team members at the time. For respect of their privacy, I would keep them anonymous, unless they request otherwise.
 
 ## Contents
 - [Context](#context)
