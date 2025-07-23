@@ -35,7 +35,13 @@ def extract_qgrams(word, q=2, swap=False):
         return qgrams
 
 # ======== REPACKAGING ======== #
-def load_words(src):
+def is_valid(word, letters=None):
+    if letters is None: # Empty can mean all letters
+        return True
+    else:
+        return all(ch in letters for ch in word.lower())
+
+def load_words(src, letters=None):
     """
     src: either
       * a list/tuple of words
@@ -59,20 +65,42 @@ def load_words(src):
     else:
         raise ValueError(f"`src` ({src}) must be a list/tuple, a path, or a string")
 
-    # now raw is a list of original words
-    words = [word.lower() for word in raw]
-
-    display = {word.lower(): word for word in raw}
+    # Now raw is a list of original words
+    words = [word.lower() for word in raw if is_valid(word, letters)]
+    display = {word.lower(): word for word in raw if is_valid(word, letters)}
+    
     return words, display
 
 addon_files = ["texting"] # Files to addon 20k_shun4midx.txt
 
 class Autocorrector:
-    def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), *, alpha=0.2, b=10):
+    def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), valid_letters = "a-z", *, alpha=0.2, b=10):
+        # Deal with allowed letters only
+        if valid_letters in (None, "", []):
+            self.letters = None
+        elif isinstance(valid_letters, str):
+            valid_letters = [valid_letters] if valid_letters != "" else []
+        elif not isinstance(valid_letters, list):
+            raise ValueError(f"`{valid_letters}` is not a string or a list of strings")
+        
+        letters = []
+
+        for letter in valid_letters:
+            if (letter == "a-z"):
+                letters += [chr(ord('a') + i) for i in range(26)]
+            elif (letter == "0-9"):
+                letters += [chr(ord('0') + i) for i in range(10)]
+            elif len(letter) == 1 and letter != " ":
+                letters.append(letter.lower() if letter.lower() else letter)
+            else:
+                raise ValueError(f"`{valid_letters}` should contain single character non-space letters only, other than abbreviations a-z and 0-9")
+
+        self.letters = set(letters)
+
+        # Deal with dictionary
         if isinstance(dictionary_list, list):
             # If a list is provided, use it directly
-            self.word_dict = dictionary_list
-            self.display_map = {word: word for word in dictionary_list}
+            self.word_dict, self.display_map = load_words(dictionary_list, self.letters)
         elif dictionary_list in addon_files:
             # Read both 20k_shun4midx and the addon_file
             base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -91,22 +119,25 @@ class Autocorrector:
                     if line.strip():
                         new_dict.append(line.strip())
 
-            self.word_dict, self.display_map = load_words(new_dict)
+            self.word_dict, self.display_map = load_words(new_dict, self.letters)
         elif os.path.isfile(dictionary_list):
             # If a file path is provided, load the dictionary from the file
             dictionary_path = os.path.abspath(dictionary_list)
-            self.word_dict, self.display_map = load_words(dictionary_path)
+            self.word_dict, self.display_map = load_words(dictionary_path, self.letters)
         else:
             # Fall back to the default file relative to this script
             base_dir = os.path.dirname(os.path.abspath(__file__))
             dictionary_path = os.path.join(base_dir, dictionary_list)
             if not os.path.isfile(dictionary_path):
                 raise FileNotFoundError(f"Default dictionary file not found: {dictionary_path}")
-            self.word_dict, self.display_map = load_words(dictionary_path)
+            self.word_dict, self.display_map = load_words(dictionary_path, self.letters)
         
         self.alpha, self.b = alpha, b
 
         self.save_dictionary() # Don't have to recompute every time
+
+    def is_valid(self, word):
+        return is_valid(word, self.letters)
 
     def save_dictionary(self):
         self.start_total = time.perf_counter()
@@ -149,7 +180,7 @@ class Autocorrector:
                 ba[self.qgram_idx[gram]] = 1
             self.word_bits.append(ba)
 
-    def autocorrect(self, queries_list, output_file="None", print_details=False, print_times=False):
+    def autocorrect(self, queries_list, output_file="None", return_invalid_words=True, print_details=False, print_times=False):
         if print_times:
             self.save_dictionary()
 
@@ -162,6 +193,16 @@ class Autocorrector:
         suggestions = {} # Dictionary
 
         for query in queries:
+            if not self.is_valid(query):
+                if return_invalid_words:
+                    suggestions[query_displays[query]] = query
+                    output.append(query_displays[query])
+                    continue
+                else:
+                    suggestions[query_displays[query]] = ""
+                    output.append("")
+                    continue
+
             # Print fuzzy HLL estimates per gram
             Q = set(extract_qgrams(query, self.q, swap=True)) # Qgrams
             if print_details:
@@ -189,11 +230,18 @@ class Autocorrector:
                     cand_idxs.append((idx, inter))
 
             if not cand_idxs:
-                if print_details:
-                    print("  -> no overlaps; returning empty")
-                suggestions[query_displays[query]] = ""
-                output.append("")
-                continue
+                if return_invalid_words:
+                    if print_details:
+                        print(f"  -> no overlaps; returning original: {query_displays[query]}")
+                    suggestions[query_displays[query]] = query
+                    output.append(query_displays[query])
+                    continue
+                else:
+                    if print_details:
+                        print("  -> no overlaps; returning empty")
+                    suggestions[query_displays[query]] = ""
+                    output.append("")
+                    continue
 
             # d) Compute Jaccard & Zipf score R for each candidate
             J = {} # Jaccards
@@ -253,11 +301,11 @@ class Autocorrector:
         # Return
         return suggestions
 
-    def top3(self, queries_list, output_file="None", print_details=False, print_times=False):
+    def top3(self, queries_list, output_file="None", return_invalid_words=True, print_details=False, print_times=False):
         if print_times:
             self.save_dictionary()
 
-        queries, query_display = load_words(queries_list)
+        queries, query_displays = load_words(queries_list)
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -266,6 +314,16 @@ class Autocorrector:
         suggestions = {} # Dictionary
 
         for query in queries:
+            if not self.is_valid(query):
+                if return_invalid_words:
+                    suggestions[query_displays[query]] = query
+                    output.append(query_displays[query])
+                    continue
+                else:
+                    suggestions[query_displays[query]] = ""
+                    output.append("")
+                    continue
+
             # Print fuzzy HLL estimates per gram
             Q = set(extract_qgrams(query, self.q, swap=True)) # Qgrams
             if print_details:
@@ -293,11 +351,18 @@ class Autocorrector:
                     cand_idxs.append((idx, inter))
 
             if not cand_idxs:
-                if print_details:
-                    print("  -> no overlaps; returning empty")
-                output.append("")
-                suggestions[query_display[query]] = ["", "", ""]
-                continue
+                if return_invalid_words:
+                    if print_details:
+                        print(f"  -> no overlaps; returning original: {query_displays[query]}  ")
+                    suggestions[query_displays[query]] = [query_displays[query], "", ""]
+                    output.append(f"{query_displays[query]}  ")
+                    continue
+                else:
+                    if print_details:
+                        print("  -> no overlaps; returning empty")
+                    suggestions[query_displays[query]] = ["", "", ""]
+                    output.append("")
+                    continue
 
             # d) Compute Jaccard & Zipf score R for each candidate
             J = {} # Jaccards
@@ -322,7 +387,7 @@ class Autocorrector:
                 print(f"{query:>12} -> top 3: {top3}")
                 print("-" * 30)
 
-            suggestions[query_display[query]] = top3
+            suggestions[query_displays[query]] = top3
             output.append(" ".join(top3))
 
         # 4) Write out

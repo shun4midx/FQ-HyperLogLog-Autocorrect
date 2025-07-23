@@ -42,6 +42,7 @@ rigged
 nah
 welp
 tgt
+pfp
 gtg
 y'all
 yall
@@ -67,6 +68,7 @@ idrk
 idc
 idrc
 woah
+dawg
 wtv
 nvm
 ikr
@@ -74,10 +76,13 @@ yipi
 yippe
 uhm
 yk
+ydk
+rmb
 okok
 altho
 cannot
 unironically
+wheezing
 bru
 bruh
 hru
@@ -125,6 +130,7 @@ shes
 she's
 he's
 hes
+he'd
 bai
 aint
 ain't
