@@ -316,8 +316,8 @@ class Autocorrector:
         for query in queries:
             if not self.is_valid(query):
                 if return_invalid_words:
-                    suggestions[query_displays[query]] = query
-                    output.append(query_displays[query])
+                    suggestions[query_displays[query]] = [query_displays[query], "", ""]
+                    output.append(f"{query_displays[query]}  ")
                     continue
                 else:
                     suggestions[query_displays[query]] = ""
