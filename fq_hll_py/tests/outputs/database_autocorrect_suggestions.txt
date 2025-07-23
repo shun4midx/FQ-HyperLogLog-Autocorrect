@@ -16,7 +16,7 @@ adultery
 aggressive
 alcohol
 alcoholic
-believe
+alive
 all_right
 amateur
 ambivalent
@@ -28,7 +28,7 @@ announce
 announcement
 anoint
 anonymous
-desperate
+appreciate
 appreciated
 archetype
 architecture
@@ -336,7 +336,7 @@ mosaic
 most_likely
 mouser
 moving
-niece
+believe
 necessary
 necessary
 necessary
@@ -395,7 +395,7 @@ privilege
 privilege
 problematic
 procedures
-pronunciation
+absorption
 absorption
 pronunciation
 properly
@@ -475,13 +475,13 @@ technically
 tests
 tests
 tests
-than_or
+anatomy
 that
 the
 the
 themselves
-hysterical
-theoretically
+accidentally
+accidentally
 accidentally
 the
 throughout

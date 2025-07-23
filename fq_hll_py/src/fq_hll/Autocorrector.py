@@ -1,4 +1,11 @@
-import sys, os, ast
+############################################
+# Copyright (c) 2025 Shun/翔海 (@shun4midx) #
+# Project: FQ-HyperLogLog-Autocorrect      #
+# File Type: Python file                   #
+# File: Autocorrector.py                   #
+############################################
+
+import sys, os
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'src'))
 sys.path.insert(0, root)
 
@@ -47,7 +54,7 @@ def load_words(src):
 
     # 3) String?
     elif isinstance(src, str):
-        return [src]
+        raw = [src]
 
     else:
         raise ValueError(f"`src` ({src}) must be a list/tuple, a path, or a string")
@@ -61,7 +68,7 @@ def load_words(src):
 addon_files = ["texting"] # Files to addon 20k_shun4midx.txt
 
 class Autocorrector:
-    def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), *, alpha=0.3, b=10):
+    def __init__(self, dictionary_list=os.path.join("test_files", "20k_shun4midx.txt"), *, alpha=0.2, b=10):
         if isinstance(dictionary_list, list):
             # If a list is provided, use it directly
             self.word_dict = dictionary_list
@@ -119,7 +126,7 @@ class Autocorrector:
             qgrams = extract_qgrams(word, self.q, swap=False)
             
             # For fuzzy‑HLL: shift by Zipf bucket, more shift = more common
-            bucket_idx = min(self.NUM_BUCKETS, (idx + 1 // self.BUCKET_SIZE) + 1)
+            bucket_idx = min(self.NUM_BUCKETS, ((idx + 1) // self.BUCKET_SIZE) + 1)
             shift = min(int(math.floor(math.log2(self.NUM_BUCKETS / bucket_idx))) * 4, 64)
             
             for gram in qgrams:
@@ -194,7 +201,7 @@ class Autocorrector:
             for idx, inter in cand_idxs:
                 uni = qb_count + self.word_bits[idx].count() - inter
                 J[idx] = inter / uni if uni else 0.0
-                R[idx] = 1 / ((idx + 1 // self.BUCKET_SIZE) + 1) # same Zipf normalization as before
+                R[idx] = 1 / (((idx + 1) // self.BUCKET_SIZE) + 1) # same Zipf normalization as before
 
             # e) Sweep tau to pick best
             best_idx = None
@@ -248,7 +255,7 @@ class Autocorrector:
 
     def top3(self, queries_list, output_file="None", print_details=False, print_times=False):
         if print_times:
-            self.save_dictionary(True)
+            self.save_dictionary()
 
         queries, query_display = load_words(queries_list)
 
@@ -298,7 +305,7 @@ class Autocorrector:
             for idx, inter in cand_idxs:
                 uni = qb_count + self.word_bits[idx].count() - inter
                 J[idx] = inter / uni if uni else 0.0
-                R[idx] = 1 / ((idx + 1 // self.BUCKET_SIZE) + 1) # same Zipf normalization as before
+                R[idx] = 1 / (((idx + 1) // self.BUCKET_SIZE) + 1) # same Zipf normalization as before
 
             # e) Sweep tau to pick top 3
             scored = []

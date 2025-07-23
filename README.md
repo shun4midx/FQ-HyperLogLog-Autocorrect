@@ -25,7 +25,7 @@ The other set was comprised of the [most commonly used 20000 English words](http
 
 Here, for the most objective measure, I counted "accuracy" as simply if the word matches what the typo originally was intended to correct to. For example, if "mant" was supposed to correct to "want" in the list, even if my code outputted "many", I'd still count it wrong.
 
-In the end, dictionary list `database.txt` performed consistently at around **87~88%** accuracy and `20k_shun4midx.txt` at around **59~60%** accuracy. For the `top3` results, it was consistently at around **94~95%** and **75~76%** respectively.
+In the end, dictionary list `database.txt` performed consistently at around **87~88%** accuracy and `20k_shun4midx.txt` at around **59~60%** accuracy. For the `top3` results, it was consistently at around **93~94%** and **75~76%** respectively.
 
 For context, I implemented the standard Levenshtein + BK-Tree autocorrection algorithm with **edit distance <= 2** (Since otherwise it would be more than five times slower than FQ-HLL) in `fq_hll_py/tests/bk_test.py`, and it performs slower but also at a lower accuracy, at around **75~76%** and **43~44%** respectively. I even increased the **edit distance to be <= 3**, and allowed the program to be slower. Even then, its accuracy only achieves around **89~90%** and **46~47%** respectively, undoubtedly it uses more memory too. The accuracy doesn't increase much after edit distance is greater than 3.
 
@@ -39,7 +39,7 @@ In `Python`, here is a rough total runtime of each algorithm to finish all queri
 | BK (ED <= 3)  | 3.816s              | 92.812s             |
 | SymSpell      | 0.515s + 0.996s     | 16.994s + 29.355s   | <- Build + Query time
 
-Inspired by how autocorrection on mobile devices offer top 3 suggestions, I have also implemented a top3 function. For **Top 3** results, where accuracy is counted for the number of queries that have one correct answer in the top 3 suggested results, FQ-HLL was able to reach accuracies of **94~95%** and **75~76%** for `database.txt` and `20k_shun4midx.txt` respectively. The times they took are roughly 0.308s and 14.602s respectively.
+Inspired by how autocorrection on mobile devices offer top 3 suggestions, I have also implemented a top3 function. For **Top 3** results, where accuracy is counted for the number of queries that have one correct answer in the top 3 suggested results, FQ-HLL was able to reach accuracies of **93~94%** and **75~76%** for `database.txt` and `20k_shun4midx.txt` respectively. The times they took are roughly 0.308s and 14.602s respectively.
 
 Given the relatively small memory usage yet huge accuracy and its potential to have LDP, FQ-HLL is something worth considering for autocorrection algorithms.
 
