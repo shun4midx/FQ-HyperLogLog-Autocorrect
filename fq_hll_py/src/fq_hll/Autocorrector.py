@@ -95,7 +95,7 @@ class Autocorrector:
             else:
                 raise ValueError(f"`{valid_letters}` should contain single character non-space letters only, other than abbreviations a-z and 0-9")
 
-        self.letters = set(letters)
+        self.letters = set(letters) if letters != [] else None
 
         # Deal with dictionary
         if isinstance(dictionary_list, list):

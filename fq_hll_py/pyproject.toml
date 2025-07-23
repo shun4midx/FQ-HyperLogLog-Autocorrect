@@ -3,13 +3,13 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fq_hll"
-version = "1.2.2"
+name = "DyslexicLogLog"
+version = "1.2.3"
 authors = [
   { name="Shun/翔海", email="shun4midx@gmail.com" },
 ]
 description = "A Frequency-Quantized HyperLogLog Autocorrection algorithm that also is dyslexia-friendly."
-readme = "Library.md"
+readme = "Dyslexic_Library.md"
 requires-python = ">=3.9"
 classifiers = [
     "Operating System :: OS Independent",
@@ -26,13 +26,13 @@ Homepage = "https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect"
 Issues = "https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fq_hll"]
+packages = ["src/dyslexicloglog"]
 
 [tool.hatch.build]
 include = [
-    "src/fq_hll/**",
+    "src/dyslexicloglog/**",
     "LICENSE",
-    "Library.md"
+    "Dyslexic_Library.md"
 ]
 exclude = [
     "tests/**",
