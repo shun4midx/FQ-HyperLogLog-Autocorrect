@@ -94,7 +94,9 @@ Here is a rough total runtime of each algorithm to finish all queries:
 | FQ-HLL        | 0.223s              | 9.955s              |
 | BK (ED <= 2)  | 2.126s              | 46.028s             |
 | BK (ED <= 3)  | 3.816s              | 92.812s             |
-| SymSpell      | 0.515s + 0.996s     | 16.994s + 29.355s   | <- Build + Query time
+| SymSpell      | 0.515s + 0.996s     | 16.994s + 29.355s   |
+
+*(SymSpell times are Build + Query time)*
 
 Inspired by how autocorrection on mobile devices offer top 3 suggestions, I have also implemented a top3 function. For **Top 3** results, where accuracy is counted for the number of queries that have one correct answer in the top 3 suggested results, FQ-HLL was able to reach accuracies of **93~94%** and **75~76%** for `database.txt` and `20k_shun4midx.txt` respectively. The times they took are roughly 0.308s and 14.602s respectively.
 
