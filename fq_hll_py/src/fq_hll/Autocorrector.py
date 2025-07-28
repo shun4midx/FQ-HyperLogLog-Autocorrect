@@ -6,11 +6,13 @@
 ############################################
 
 import sys, os
+from typing import Dict, List, Union
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'src'))
 sys.path.insert(0, root)
 
 import math
 import time
+from dataclasses import dataclass
 from .HyperLogLog import SketchConfig, HyperLogLog
 from bitarray import bitarray
 
@@ -72,6 +74,11 @@ def load_words(src, letters=None):
     return words, display
 
 addon_files = ["texting"] # Files to addon 20k_shun4midx.txt
+
+@dataclass
+class Results:
+    suggestions: Dict[str, Union[str, List[str]]]
+    scores: Dict[str, Union[float, List[float]]]
 
 class Autocorrector:
     # Default non-custom imported keyboards here would disregarded special characters (such as commas, not things like é and ö). Please import your own if you need to. I consider number rows too.
@@ -323,15 +330,18 @@ class Autocorrector:
 
         output = []
         suggestions = {} # Dictionary
+        final_scores = {}
 
         for query in queries:
             if not self.is_valid(query):
                 if return_invalid_words:
                     suggestions[query_displays[query]] = query
+                    final_scores[query_displays[query]] = 0.0
                     output.append(query_displays[query])
                     continue
                 else:
                     suggestions[query_displays[query]] = ""
+                    final_scores[query_displays[query]] = 0.0
                     output.append("")
                     continue
 
@@ -368,12 +378,14 @@ class Autocorrector:
                     if print_details:
                         print(f"  -> no overlaps; returning original: {query_displays[query]}")
                     suggestions[query_displays[query]] = query
+                    final_scores[query_displays[query]] = 0.0
                     output.append(query_displays[query])
                     continue
                 else:
                     if print_details:
                         print("  -> no overlaps; returning empty")
                     suggestions[query_displays[query]] = ""
+                    final_scores[query_displays[query]] = 0.0
                     output.append("")
                     continue
 
@@ -416,6 +428,7 @@ class Autocorrector:
 
             displayed_picked = self.display_map.get(picked, picked)
             suggestions[query_displays[query]] = displayed_picked
+            final_scores[query_displays[query]] = best_score
             output.append(displayed_picked)
 
         # 4) Write out
@@ -434,7 +447,7 @@ class Autocorrector:
             print(f"Total autocorrect: {self.end_total - self.start_total:.3f}s")
 
         # Return
-        return suggestions
+        return Results(suggestions=suggestions, scores=final_scores)
 
     def top3(self, queries_list, output_file="None", use_keyboard=True, return_invalid_words=True, print_details=False, print_times=False):
         if print_times:
@@ -447,15 +460,18 @@ class Autocorrector:
 
         output = [] # Output
         suggestions = {} # Dictionary
+        final_scores = {}
 
         for query in queries:
             if not self.is_valid(query):
                 if return_invalid_words:
                     suggestions[query_displays[query]] = [query_displays[query], "", ""]
+                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
                     output.append(f"{query_displays[query]}  ")
                     continue
                 else:
                     suggestions[query_displays[query]] = ["", "", ""]
+                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
                     output.append("")
                     continue
 
@@ -492,12 +508,14 @@ class Autocorrector:
                     if print_details:
                         print(f"  -> no overlaps; returning original: {query_displays[query]}  ")
                     suggestions[query_displays[query]] = [query_displays[query], "", ""]
+                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
                     output.append(f"{query_displays[query]}  ")
                     continue
                 else:
                     if print_details:
                         print("  -> no overlaps; returning empty")
                     suggestions[query_displays[query]] = ["", "", ""]
+                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
                     output.append("")
                     continue
 
@@ -535,22 +553,26 @@ class Autocorrector:
             final.sort(key=lambda x: x[0], reverse=True)
             seen = set()
             top3 = []
-            for _, idx in final:
+            top3_scores = []
+            for score, idx in final:
                 suggestion = self.display_map[self.word_dict[idx]]
                 if suggestion not in seen:
                     seen.add(suggestion)
                     top3.append(suggestion)
+                    top3_scores.append(score) 
                     if len(top3) == 3:
                         break
 
             while len(top3) < 3:
                 top3.append("")
+                top3_scores.append(0.0)
         
             if print_details:
                 print(f"{query:>12} -> top 3: {top3}")
                 print("-" * 30)
 
             suggestions[query_displays[query]] = top3
+            final_scores[query_displays[query]] = top3_scores
             output.append(" ".join(top3))
 
         # 4) Write out
@@ -568,7 +590,7 @@ class Autocorrector:
             print(f"Total autocorrect: {self.end_total - self.start_total:.3f}s")
 
         # Return
-        return suggestions
+        return Results(suggestions=suggestions, scores=final_scores)
 
 # ======== SAMPLE USAGE ======== #
 if __name__ == "__main__":
@@ -576,7 +598,8 @@ if __name__ == "__main__":
 
     # File
     ans1 = ac.autocorrect("test_files/typo_file.txt", "test_files/class_suggestions.txt")
-    print(ans1)
+    print(ans1.suggestions)
+    print(ans1.scores)
 
     ans2 = ac.top3("test_files/typo_file.txt", "test_files/class_suggestions.txt")
 
@@ -589,12 +612,12 @@ if __name__ == "__main__":
     ans5 = ac.autocorrect(["tsetign", "hillo", "goobye", "haedhpoesn"])
     ans6 = ac.top3(["tsetign", "hillo", "goobye", "haedhpoesn"])
 
-    # # You can even have a custom dictionary!
+    # You can even have a custom dictionary!
     dictionary = ["apple", "banana", "grape", "orange"]
     custom_ac = Autocorrector(dictionary)
 
     ans7 = custom_ac.autocorrect(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
     ans8 = custom_ac.top3(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
 
-    print(ans7)
-    print(ans8)
+    print(ans7.suggestions)
+    print(ans8.suggestions)

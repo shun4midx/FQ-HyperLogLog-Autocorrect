@@ -17,7 +17,8 @@ if __name__ == "__main__":
 
     # File
     ans1 = ac.autocorrect("test_files/typo_file.txt", "test_files/class_suggestions.txt")
-    print(ans1)
+    print(ans1.suggestions)
+    print(ans1.scores)
 
     ans2 = ac.top3("test_files/typo_file.txt", "test_files/class_suggestions.txt")
 
@@ -37,8 +38,8 @@ if __name__ == "__main__":
     ans7 = custom_ac.autocorrect(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
     ans8 = custom_ac.top3(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
 
-    print(ans7)
-    print(ans8)
+    print(ans7.suggestions)
+    print(ans8.suggestions)
 ```
 
 As a side note, `compare.py` and `compare3.py`, as [files](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py/src/fq_hll) that are quite useful for comparing between intended outputs and actual outputs, can be used via 

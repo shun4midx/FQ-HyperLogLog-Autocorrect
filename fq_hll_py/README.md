@@ -11,7 +11,7 @@ or
 
 ```cmd
 pip install DyslexicLogLog
-````
+```
 
 Now, you can use the library!
 
@@ -29,7 +29,8 @@ if __name__ == "__main__":
 
     # File
     ans1 = ac.autocorrect("test_files/typo_file.txt", "test_files/class_suggestions.txt")
-    print(ans1)
+    print(ans1.suggestions)
+    print(ans1.scores)
 
     ans2 = ac.top3("test_files/typo_file.txt", "test_files/class_suggestions.txt")
 
@@ -43,14 +44,14 @@ if __name__ == "__main__":
     ans6 = ac.top3(["tsetign", "hillo", "goobye", "haedhpoesn"])
 
     # You can even have a custom dictionary!
-    dictionary = ["apple", "banana", "grape", "orange"] # Note that this dictionary would be treated as if it's from most to least frequently used
+    dictionary = ["apple", "banana", "grape", "orange"]
     custom_ac = Autocorrector(dictionary)
 
     ans7 = custom_ac.autocorrect(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
     ans8 = custom_ac.top3(["applle", "banana", "banan", "orenge", "grap", "pineapple"])
 
-    print(ans7)
-    print(ans8)
+    print(ans7.suggestions)
+    print(ans8.suggestions)
 ```
 
 There is also a mode for texting, which combines the `texting.txt` file here underneath the `20k_shun4midx.txt` file, when ranked according to frequency. You could simply call the following command instead of simply `ac = Autocorrector()` to use this combined dictionary:
