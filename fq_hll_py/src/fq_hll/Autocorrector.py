@@ -455,7 +455,7 @@ class Autocorrector:
                     output.append(f"{query_displays[query]}  ")
                     continue
                 else:
-                    suggestions[query_displays[query]] = ""
+                    suggestions[query_displays[query]] = ["", "", ""]
                     output.append("")
                     continue
 
