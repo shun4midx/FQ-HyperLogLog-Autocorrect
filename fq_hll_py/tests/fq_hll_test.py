@@ -14,11 +14,11 @@ if __name__ == "__main__":
     # Test files
     autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/20k_autocorrect_suggestions.txt", False, False, True, True) # Print details and print times
     autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/qwerty_20k_autocorrect_suggestions.txt", True, False, False, True) # Don't print details but print times
-    print(autocor)
+    # print(autocor)
 
     top3_ans = ac.top3("test_files/typo_file.txt", "outputs/20k_top3_suggestions.txt", False, False, True, True) # Print details and print times
     top3_ans = ac.top3("test_files/typo_file.txt", "outputs/qwerty_20k_top3_suggestions.txt", True, False, False, True) # Don't print details but print times
-    print(top3_ans)
+    # print(top3_ans)
 
     # Run files
     compare_files("outputs/qwerty_20k_autocorrect_suggestions.txt", "test_files/typo_file.txt", "test_files/output_compare.txt")

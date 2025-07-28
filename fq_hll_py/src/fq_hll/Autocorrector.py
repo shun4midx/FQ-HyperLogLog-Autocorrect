@@ -167,11 +167,11 @@ class Autocorrector:
         self.removed_words = set()
         self.compact_threshold = 0.1
 
-    def squared_key_dist(self, a, b):
+    def key_dist(self, a, b):
         xa, ya = self.KEY_POS.get(a, (0,0))
         xb, yb = self.KEY_POS.get(b, (0,0))
         dx, dy = xa - xb, ya - yb
-        return dx*dx + dy*dy
+        return math.sqrt(dx*dx + dy*dy)
     
     def word_dist(self, a, b):
         na, nb = len(a), len(b)
@@ -185,7 +185,7 @@ class Autocorrector:
             for j in range(1, nb + 1):
                 bj = b[j - 1].lower()
                 # substitution = prev[j - 1] + key_distance(a[i - 1], b[j - 1])
-                cost_sub = prev[j - 1] + self.squared_key_dist(ai, bj)
+                cost_sub = prev[j - 1] + self.key_dist(ai, bj)
                 # deletion = prev[j] + 1, insertion = curr[j - 1] + 1
                 cost_del = prev[j] + 1.0
                 cost_ins = curr[j - 1] + 1.0
