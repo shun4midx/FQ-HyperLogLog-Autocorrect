@@ -228,7 +228,7 @@ class Autocorrector:
             for gram in qgrams:
                 if gram not in self.qgram_sketches:
                     self.qgram_sketches[gram] = HyperLogLog(self.cfg)
-                self.qgram_sketches[gram].shifted_insert(f"{gram}_u{idx + 1}", shift)
+                self.qgram_sketches[gram].shifted_insert(f"{gram}_{word}", shift)
 
         # 2) Precompute dict‐word q‑gram sets for Jaccard
         self.t1 = time.perf_counter()
@@ -285,7 +285,7 @@ class Autocorrector:
             shift = min(int(math.floor(math.log2(self.NUM_BUCKETS / bucket_idx))) * 4, 64)
             for gram in qgrams:
                 sketch = self.qgram_sketches.setdefault(gram, HyperLogLog(self.cfg))
-                sketch.shifted_insert(f"{gram}_u{base + idx}", shift)
+                sketch.shifted_insert(f"{gram}_{word}", shift)
 
         # If new grams appeared, extend existing bitarrays by zeros
         new_all = sorted(self.qgram_sketches)
