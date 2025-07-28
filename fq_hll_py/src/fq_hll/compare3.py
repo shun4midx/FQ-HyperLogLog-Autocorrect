@@ -32,11 +32,12 @@ def compare3_files(file1, file2, ground_truth):
 
         # File1 may have up to 3 suggestions separated by spaces
         suggestions1 = a.split()
+        suggestions2 = b.split()
         result = []
         if t in suggestions1:
             correct1 += 1
             result.append("OK1")
-        if b == t:
+        if t in suggestions2:
             correct2 += 1
             result.append("OK2")
 

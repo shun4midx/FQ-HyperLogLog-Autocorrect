@@ -20,7 +20,7 @@ def compare_files(file1, file2, ground_truth):
     out2 += [''] * (max_len - len(out2))
     gold += [''] * (max_len - len(gold))
 
-    correct1 = correct2 = 0
+    correct1 = correct2 = diff = 0
 
     print(f"{'Idx':<5} | {'Truth':<20} | {'File 1':<20} | {'File 2':<20} | Result")
     print("-" * 95)
@@ -35,16 +35,17 @@ def compare_files(file1, file2, ground_truth):
         if b == t:
             correct2 += 1
             result += "OK2 "
+        elif a != b:
+            diff += 1
 
         print(f"{i+1:<5} | {t:<20} | {a or '[empty]':<20} | {b or '[empty]':<20} | {result or 'X'}")
 
     print("\nSummary")
     print("-" * 95)
     print(f"Total queries            : {max_len}")
-    print(f"Correct in File 1        : {correct1}")
-    print(f"Correct in File 2        : {correct2}")
-    print(f"Accuracy (File 1)        : {correct1 / max_len * 100:.2f}%")
-    print(f"Accuracy (File 2)        : {correct2 / max_len * 100:.2f}%")
+    print(f"Correct in File 1        : {correct1} ({correct1 / max_len * 100:.2f}%)")
+    print(f"Correct in File 2        : {correct2} ({correct2 / max_len * 100:.2f}%)")
+    print(f"Different Suggestions    : {diff}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:

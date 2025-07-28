@@ -101,3 +101,18 @@ Here is a rough total runtime of each algorithm to finish all queries:
 Inspired by how autocorrection on mobile devices offer top 3 suggestions, I have also implemented a top3 function. For **Top 3** results, where accuracy is counted for the number of queries that have one correct answer in the top 3 suggested results, FQ-HLL was able to reach accuracies of **93~94%** and **75~76%** for `database.txt` and `20k_shun4midx.txt` respectively. The times they took are roughly 0.308s and 14.602s respectively.
 
 Given the relatively small memory usage yet huge accuracy and its potential to have LDP, FQ-HLL is something worth considering for autocorrection algorithms.
+
+## Remark on Keyboards
+As a side note, I made the QWERTY keyboard (including AZERTY, QWERTZ, Colemak, Dvorak, or any other custom keyboard layout) as toggleable parameters to influence my FQ-HLL, since I am coding with [Ducky](https://github.com/ducky4life) to create an FQ-HLL Android keyboard. In this case, runtime slowed down by only 1 second for the `20k_shun4midx.txt` file, but achieving accuracy of **64~65%** and **80~81%**, for the autocorrection and top 3 results respectively. However, the main takeaway of this repository is how strong FQ-HLL is without the knowledge of a keyboard layout, which is why I make it something that can be turned off, and most results woud be dedicated to that.
+
+Notice, these keyboards are accessible in `Python` for example via:
+
+```py
+ac = Autocorrection(keyboard="qwerty")
+```
+
+or
+
+```py
+ac = Autocorrection(keyboard=["custom_row1", "custom_row2", etc])
+```
