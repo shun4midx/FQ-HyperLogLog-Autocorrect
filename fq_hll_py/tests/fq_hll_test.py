@@ -12,13 +12,13 @@ if __name__ == "__main__":
     ac = Autocorrector(valid_letters = "")
 
     # Test files
-    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/20k_autocorrect_suggestions.txt", False, False, True, True) # Print details and print times
-    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/qwerty_20k_autocorrect_suggestions.txt", True, False, False, True) # Don't print details but print times
+    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/20k_autocorrect_suggestions.txt", False, False, True, True) # Don't use keyboard, print details and print times
+    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/qwerty_20k_autocorrect_suggestions.txt", True, False, False, True) # Use keyboard, don't print details but print times
     # print(autocor.suggestions)
     # print(autocor.scores)
 
-    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/20k_top3_suggestions.txt", False, False, True, True) # Print details and print times
-    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/qwerty_20k_top3_suggestions.txt", True, False, False, True) # Don't print details but print times
+    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/20k_top3_suggestions.txt", False, False, True, True) # Don't use keyboard, print details and print times
+    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/qwerty_20k_top3_suggestions.txt", True, False, False, True) # Use keyboard, don't print details but print times
     # print(top3_ans.suggestions)
     # print(top3_ans.scores)
 
@@ -30,13 +30,13 @@ if __name__ == "__main__":
     ac = Autocorrector("test_files/database.txt", valid_letters = "") # It is able to search within the src folder first, before searching in the user's folder
 
     # Test files
-    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/database_autocorrect_suggestions.txt", False, True, True) # Print details and print times
-    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/qwerty_database_autocorrect_suggestions.txt", True, False, False, True) # Don't print details but print times
+    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/database_autocorrect_suggestions.txt", False, False, True, True) # Don't use keyboard, print details and print times
+    autocor = ac.autocorrect("test_files/typo_file.txt", "outputs/qwerty_database_autocorrect_suggestions.txt", True, False, False, True) # Use keyboard, don't print details but print times
     # print(autocor.suggestions)
     # print(autocor.scores)
 
-    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/database_top3_suggestions.txt", False, True, True) # Print details and print times
-    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/qwerty_database_top3_suggestions.txt", True, False, False, True) # Don't print details but print times
+    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/database_top3_suggestions.txt", False, False, True, True) # Don't use keyboard, print details and print times
+    top3_ans = ac.top3("test_files/typo_file.txt", "outputs/qwerty_database_top3_suggestions.txt", True, False, False, True) # Use keyboard, don't print details but print times
     # print(top3_ans.suggestions)
     # print(top3_ans.scores)
 

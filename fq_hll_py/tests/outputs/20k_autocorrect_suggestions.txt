@@ -117,7 +117,7 @@ daly
 languages
 belong
 position
-defenses
+defense
 defence
 defended
 definite
