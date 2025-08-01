@@ -287,14 +287,14 @@ class Autocorrector:
                 sketch = self.qgram_sketches.setdefault(gram, HyperLogLog(self.cfg))
                 sketch.shifted_insert(f"{gram}_{word}", shift)
 
-        # If new grams appeared, extend existing bitarrays by zeros
+        # If new qgrams appeared, extend existing bitarrays by zeros
         new_all = sorted(self.qgram_sketches)
         delta = len(new_all) - len(self.all_qgrams)
         if delta > 0:
             for ba in self.word_bits:
                 ba.extend([0] * delta)
-            self.all_qgrams  = new_all
-            self.qgram_idx   = {gram: idx for idx, gram in enumerate(new_all)}
+            self.all_qgrams = new_all
+            self.qgram_idx = {gram: idx for idx, gram in enumerate(new_all)}
             self.TOTAL_QGRAMS = len(new_all)
 
         # Finally append one bitarray per new word
