@@ -71,6 +71,9 @@ public:
     void add_dictionary(StrVec to_be_added);
     void remove_dictionary(StrVec to_be_removed);
 
+    Result autocorrect(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
+    Results top3(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
+
     Result autocorrect(const StrVec& queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
     Results top3(const StrVec& queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
 

@@ -477,6 +477,14 @@ void Autocorrector::remove_dictionary(StrVec to_be_removed) {
     }
 }
 
+Result Autocorrector::autocorrect(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file, bool use_keyboard, bool return_invalid_words, bool print_details, bool print_times) {
+    return autocorrect((std::vector<std::string>)(queries_list), output_file, use_keyboard, return_invalid_words, print_details, print_times);
+}
+
+Results Autocorrector::top3(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file, bool use_keyboard, bool return_invalid_words, bool print_details, bool print_times) {
+    return top3((std::vector<std::string>)(queries_list), output_file, use_keyboard, return_invalid_words, print_details, print_times);
+}
+
 
 Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::path output_file, bool use_keyboard, bool return_invalid_words, bool print_details, bool print_times) {
     if (print_times) {

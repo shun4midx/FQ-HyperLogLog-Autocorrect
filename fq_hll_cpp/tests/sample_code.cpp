@@ -24,9 +24,9 @@ int main() {
     Result ans3 = ac.autocorrect("hillo");
     Results ans4 = ac.top3("hillo");
 
-    // Vectors (Note that you would need to parse it specifically as a std::vector<std::string>)
+    // Vectors (either ans5 or ans6 parsing works)
     std::vector<std::string> vec = {"tsetign", "hillo", "goobye", "haedhpoesn"};
-    Result ans5 = ac.autocorrect(vec); // Optionally, ac.autocorrect(std::vector<std::string>{"tsetign", "hillo", "goobye", "haedhpoesn"}). Yes, std::vector<std::string> here is mandatory
+    Result ans5 = ac.autocorrect({"tsetign", "hillo", "goobye", "haedhpoesn"});
     Results ans6 = ac.top3(vec);
 
     // You can even have a custom dictionary!
@@ -35,9 +35,10 @@ int main() {
     cfg.dictionary_list = dictionary;
     Autocorrector custom_ac(cfg);
 
+    // Either ans7 or ans8 parsing works
     std::vector<std::string> inputs = {"applle", "banana", "banan", "orenge", "grap", "pineapple"};
     Result ans7 = custom_ac.autocorrect(inputs);
-    Results ans8 = custom_ac.top3(inputs);
+    Results ans8 = custom_ac.top3({"applle", "banana", "banan", "orenge", "grap", "pineapple"});
 
     for (const auto& [key, value] : ans7.suggestions) {
         std::cout << key << " -> " << value << std::endl;
