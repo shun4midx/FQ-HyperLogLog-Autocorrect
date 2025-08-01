@@ -64,6 +64,7 @@ inline int popcount64(uint64_t x);
 class Autocorrector {
 public:
     explicit Autocorrector(AutocorrectorCfg& cfg);
+    Autocorrector& operator=(const Autocorrector& ac) = default;
     explicit Autocorrector(StrVec _dictionary_list = std::filesystem::path{"test_files"} / std::filesystem::path{"20k_shun4midx.txt"}, StrVec _valid_letters = "a-z", StrVec _keyboard = "qwerty", double _alpha = 0.2, double _beta = 0.35, int _b = 10);
 
     void save_dictionary();
