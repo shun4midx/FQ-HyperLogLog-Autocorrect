@@ -1,0 +1,1 @@
+Full documentation and CMake files would be provided later, but please remember to use the `-O2` flag when running the code, it would make it way faster!
