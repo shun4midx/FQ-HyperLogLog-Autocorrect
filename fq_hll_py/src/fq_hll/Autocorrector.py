@@ -256,7 +256,7 @@ class Autocorrector:
                 self.removed_words.discard(word)
 
         if not added:
-            return []
+            return
 
         old_exp = int(math.log2(self.NUM_BUCKETS))
         new_exp = math.ceil(math.log2(len(self.word_dict) + len(added)) / 2)
@@ -267,7 +267,7 @@ class Autocorrector:
             for word in added:
                 self.display_map[word] = displays[word]
             self.save_dictionary()
-            return added
+            return
 
         # 2) Otherwise true O(1) per‑word work:
         # Recompute NUM_BUCKETS (BUCKET_SIZE stays frozen)
@@ -303,8 +303,6 @@ class Autocorrector:
             for gram in extract_qgrams(w, self.q, fuzzier=False):
                 ba[self.qgram_idx[gram]] = 1
             self.word_bits.append(ba)
-
-        return added
 
     def remove_dictionary(self, to_be_removed):
         words, _ = load_words(to_be_removed, self.letters)
