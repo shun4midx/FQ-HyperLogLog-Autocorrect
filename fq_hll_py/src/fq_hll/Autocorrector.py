@@ -375,7 +375,7 @@ class Autocorrector:
                 if return_invalid_words:
                     if print_details:
                         print(f"  -> no overlaps; returning original: {query_displays[query]}")
-                    suggestions[query_displays[query]] = query
+                    suggestions[query_displays[query]] = query_displays[query]
                     final_scores[query_displays[query]] = 0.0
                     output.append(query_displays[query])
                     continue
