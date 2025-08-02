@@ -47,7 +47,7 @@ void compare3_files(std::filesystem::path file1, std::filesystem::path file2, st
     std::vector<std::string> gold = read_lines(ground_truth);
 
     // Pad all three to the same length
-    int max_len = std::max({out1.size(), out2.size(), gold.size()});
+    int max_len = std::max(std::max(out1.size(), out2.size()), gold.size());
     out1.resize(max_len, "");
     out2.resize(max_len, "");
     gold.resize(max_len, "");
