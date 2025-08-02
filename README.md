@@ -1,6 +1,6 @@
 # Frequency-Quantized HyperLogLog Autocorrect
 
-## NOTE: Specific details on how to run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately
+## NOTE: Specific details on how to install and run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately
 
 An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library based on my final project in **Advanced Data Structures 2025**, with credit to my team members at the time. For respect of their privacy, I would keep them anonymous, unless they request otherwise.
 
@@ -56,17 +56,7 @@ Given the relatively small memory usage yet huge accuracy and its potential to h
 ## Remark on Keyboards
 As a side note, I made the QWERTY keyboard (including AZERTY, QWERTZ, Colemak, Dvorak, or any other custom keyboard layout) as toggleable parameters to influence my FQ-HLL, since I am coding with [Ducky](https://github.com/ducky4life) to create an FQ-HLL Android keyboard. In this case, runtime slowed down by only 1 second for the `20k_shun4midx.txt` file, but achieving accuracy of **64~65%** and **80~81%**, for the autocorrection and top 3 results respectively. However, the main takeaway of this repository is how strong FQ-HLL is without the knowledge of a keyboard layout, which is why I make it something that can be turned off, and most results woud be dedicated to that.
 
-Notice, these keyboards are accessible in `Python` for example via:
-
-```py
-ac = Autocorrection(keyboard="qwerty")
-```
-
-or
-
-```py
-ac = Autocorrection(keyboard=["custom_row1", "custom_row2", etc])
-```
+Specific details in how these keyboards can be accessed in the programming languages are available in `fq_hll_cpp/README.md` and `fq_hll_py/README.md` separately.
 
 ## Notes
  - HLL naturally doesn't have Local Differential Privacy (LDP) yet, but has natural obfuscation.
@@ -78,12 +68,13 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - As a side note, as a dyslexic person, I naturally process words similar to how the FQ-HLL algorithm processes words, and that was my intuition in terms of how to create this algorithm in the first place.
 
 ## Plans for the Repo
- - Develop a Python library importable via `pip install`
- - [Maybe] Include a C++ library too that is importable via CMake, since as most of you know, I love C++.
+ - [✅] Develop a Python library importable via `pip install`
+ - [✅] Include a C++ library too that is importable via CMake, since as most of you know, I love C++.
  - Formally document the logic behind the algorithm via a LaTeX file (or its PDF directly).
- - If time permits, I may include a formal proof of FQ-HLL, the FQ-HLL algorithm's validity, and potential developments in LDP.
+ - If time permits, I may include a formal proof and potential developments in LDP.
 
 ## Current Repos using this FQ-HLL Library
+ - [C++] FQ-HLL Keyboard: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development. The GitHub link will be provided once available.
  - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
  - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
  - [Python] A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
