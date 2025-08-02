@@ -1,11 +1,113 @@
-Full documentation and CMake files would be provided later, but please remember to use the `-O2` flag when running the code, it would make it way faster!
+## Installation
+### 1. Clone the Repo
 
-As of right now, without CMake, this is how the file `fq_hll_test.cpp` is run after cloning this repo:
-
-```cmd
-> g++ -std=c++17 -O2 -I../src/include -I../src/include/FQ-HLL ../src/src/*.cpp fq_hll_test.cpp
-> ./a.out
+```bash
+git clone https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect
+cd FQ-HyperLogLog-Autocorrect/fq_hll_cpp
 ```
+
+Remember to **NOT** delete the repo folder if you are using the C++ FQ-HLL library, or else code may not function properly. Only do so if you plan to uninstall.
+
+### 2. Build and Install
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+sudo cmake --install build
+```
+
+This installs:
+
+* Headers to `/usr/local/include/FQ-HLL`
+* Static library to `/usr/local/lib/libfq_hll.a`
+* CMake config to `/usr/local/lib/cmake/fq_hll`
+* CLI shims: `/usr/local/bin/fq_hll_g++`, `/usr/local/bin/fq_hll_clang++`
+
+## Usage
+
+For optimal performance, please run the code with `-O2` or `-O3`.
+
+### Option 1: CMake Project (Recommended)
+
+If you're using CMake, create a new file:
+```cmd
+touch CMakeLists.txt
+```
+
+Open it, then paste the following:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(<project_name>)
+
+# Set C++17 and optimization
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE Release)  # Ensures -O2 by default
+
+find_package(fq_hll REQUIRED)
+
+add_executable(<project_name> <file_name>.cpp)
+target_link_libraries(<project_name> PRIVATE fq_hll::fq_hll)
+```
+
+Compile:
+
+```bash
+cmake -B build
+cmake --build build
+```
+
+Execute:
+```bash
+./build/<project_name>
+```
+
+### Option 2: Test Projects
+
+If you want to compile directly without setting include/lib flags:
+
+```bash
+fq_hll_g++ <file_name>.cpp -o <file_exec>
+./<file_exec>
+```
+
+Or:
+
+```bash
+fq_hll_clang++ <file_name>.cpp -o demo
+./<file_exec>
+```
+
+These default to `-std=c++17 -O2` and handle linking for you, where the `O2` flag ensures faster performance.
+
+
+## Uninstall
+
+To completely remove the library:
+
+### Option 1: Manual
+
+```bash
+sudo rm -rf /usr/local/include/FQ-HLL
+sudo rm -f /usr/local/lib/libfq_hll.a
+sudo rm -rf /usr/local/lib/cmake/fq_hll
+sudo rm -f /usr/local/bin/fq_hll_g++
+sudo rm -f /usr/local/bin/fq_hll_clang++
+```
+
+### Option 2: Run Uninstall Script
+
+```bash
+cd FQ-HyperLogLog-Autocorrect/fq_hll_cpp/scripts
+./uninstall_fq_hll
+```
+
+This script will prompt for confirmation and cleanly remove all installed files.
+
+## Requirements
+* CMake >= 3.10
+* C++17-compatible compiler
 
 ## Usage
 The library defaults to searching within its own folder before searching in your local directory. There are two text files offered as base dictionaries: `20k_shun4midx.txt` and `database.txt`, with around 20000 and 400 words respectively. The below code would only visit the local directory. If no dictionary is specified, `20k_shun4midx.txt` would be used instead.
