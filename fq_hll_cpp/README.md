@@ -188,17 +188,15 @@ If you have any suggestions of other categories of words to add other than texti
 As a side note, `compare.cpp` and `compare3.cpp`, as [files](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp/src/src) that are quite useful for comparing between intended outputs and actual outputs, can be used via 
 
 ```cpp
-// ======== AS OF RIGHT NOW WITHOUT CMAKE ======== //
 #include <FQ-HLL/FQ-HLL.h>
-compare_files(suggestions, typos, answers)
+compare_files(suggestions, typos, answers);
 ```
 
 or if we are doing Top 3 words selected per row,
 
 ```cpp
-// ======== AS OF RIGHT NOW WITHOUT CMAKE ======== //
 #include <FQ-HLL/FQ-HLL.h>
-compare3_files(suggestions, typos, answers)
+compare3_files(suggestions, typos, answers);
 ```
 
 ## Remark on Keyboards
