@@ -118,7 +118,6 @@ The library defaults to searching within its own folder before searching in your
 What is returned is in the form of a dictionary, mapping each query to either a single string for `autocorrect` or a list of three strings for `top3`. 
 
 ```cpp
-// ======== AS OF RIGHT NOW WITHOUT CMAKE ======== //
 #include <FQ-HLL/FQ-HLL.h>
 #include <iostream>
 #include <string>
