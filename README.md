@@ -1,4 +1,5 @@
-# Frequency-Quantized HyperLogLog Autocorrect
+# Frequency-Quantized HyperLogLog Autocorrect 
+<a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B">  <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
 ## NOTE: Specific details on how to install and run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately
 
@@ -75,10 +76,14 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - If time permits, I may include a formal proof and potential developments in LDP.
 
 ## Current Repos using this FQ-HLL Library
- - [C++] FQ-HLL Keyboard: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development with [Ducky](https://github.com/ducky4life). The GitHub link will be provided once available.
- - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
- - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
- - [Python] A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
+ <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B">
+ - FQ-HLL Keyboard: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development with [Ducky](https://github.com/ducky4life). The GitHub link will be provided once available.
+
+ <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
+
+ - A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
+ - An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
+ - A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
 
 ## License
 MIT License, reference `LICENSE` for more information.
