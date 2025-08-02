@@ -11,6 +11,7 @@ An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library base
 - [Notes](#notes)
 - [Plans](#plans-for-the-repo)
 - [Current Usages](#current-repos-using-this-fq-hll-library)
+- [License](#license)
 
 ## Context
 For context, we did Autocorrection for our final project, and I was tasked to design an Autocorrection algorithm using HLL. HLL demonstrated decent performance (accuracy, speed, and memory) compared to the [baseline](https://arxiv.org/pdf/2208.05264) with preliminary trials, but in our evaluation, we realized the way our algorithm didn't give HLL a fair chance. 
@@ -68,8 +69,8 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - As a side note, as a dyslexic person, I naturally process words similar to how the FQ-HLL algorithm processes words, and that was my intuition in terms of how to create this algorithm in the first place.
 
 ## Plans for the Repo
- - [✅] Develop a Python library importable via `pip install`
- - [✅] Include a C++ library too that is importable via CMake, since as most of you know, I love C++.
+ - ✅ Develop a Python library importable via `pip install`
+ - ✅ Include a C++ library that is importable via CMake, since as most of you know, I love C++.
  - Formally document the logic behind the algorithm via a LaTeX file (or its PDF directly).
  - If time permits, I may include a formal proof and potential developments in LDP.
 
@@ -78,3 +79,6 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
  - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
  - [Python] A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
+
+## License
+MIT License, reference `LICENSE` for more information.
