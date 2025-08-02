@@ -17,9 +17,6 @@ install(TARGETS fq_hll
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/fq_hll
-    DESTINATION ${CMAKE_INSTALL_BINDIR})
-
 install(PROGRAMS scripts/fq_hll_g++ scripts/fq_hll_clang++
     DESTINATION ${CMAKE_INSTALL_BINDIR})
 
