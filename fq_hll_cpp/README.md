@@ -97,18 +97,6 @@ or if we are doing Top 3 words selected per row,
 compare3_files(suggestions, typos, answers)
 ```
 
-## Results
-In the end, dictionary list `database.txt` performed consistently at around **87~88%** accuracy and `20k_shun4midx.txt` at around **59~60%** accuracy. For the `top3` results, it was consistently at around **93~94%** and **75~76%** respectively.
-
-In `C++`, due to time constraints and the fact that Python [demonstrated well enough](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/blob/main/fq_hll_py/README.md) the efficiency and relative accuracy of FQ-HLL, only FQ-HLL has been demonstrated here, and top3 results are as shown. Execution details are in the README file of `fq_hll_cpp`, most importantly, remember to use the `-O2` flag. The accuracy was unchanged.
-
-| Method        | `database.txt`      | `20k_shun4midx.txt` |
-| ------------- | ------------------- | ------------------- |
-| FQ-HLL (Auto) | 0.071s              | 2.649s              |
-| FQ-HLL (Top3) | 0.084s              | 3.716s              |
-
-Given the relatively small memory usage yet huge accuracy and its potential to have LDP, FQ-HLL is something worth considering for autocorrection algorithms.
-
 ## Remark on Keyboards
 As a side note, I made the QWERTY keyboard (including AZERTY, QWERTZ, Colemak, Dvorak, or any other custom keyboard layout) as toggleable parameters to influence my FQ-HLL, since I am coding with [Ducky](https://github.com/ducky4life) to create an FQ-HLL Android keyboard. In this case, runtime slowed down by only 1 second for the `20k_shun4midx.txt` file, but achieving accuracy of **64~65%** and **80~81%**, for the autocorrection and top 3 results respectively. However, the main takeaway of this repository is how strong FQ-HLL is without the knowledge of a keyboard layout, which is why I make it something that can be turned off, and most results woud be dedicated to that.
 
