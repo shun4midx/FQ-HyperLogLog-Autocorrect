@@ -1,5 +1,5 @@
 # Frequency-Quantized HyperLogLog Autocorrect 
-<a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B">  <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
+<a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B"><a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
 ## NOTE: Specific details on how to install and run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately
 
