@@ -16,11 +16,11 @@ if __name__ == "__main__":
     ac = Autocorrector()
 
     # File
-    ans1 = ac.autocorrect("test_files/typo_file.txt", "test_files/class_suggestions.txt")
+    ans1 = ac.autocorrect("test_files/typo_file.txt", "outputs/class_suggestions.txt")
     print(ans1.suggestions)
     print(ans1.scores)
 
-    ans2 = ac.top3("test_files/typo_file.txt", "test_files/class_suggestions.txt")
+    ans2 = ac.top3("test_files/typo_file.txt", "outputs/class_suggestions.txt")
 
     # Optionally, you can not want it to output it into a file, then:
     # Individual strings
