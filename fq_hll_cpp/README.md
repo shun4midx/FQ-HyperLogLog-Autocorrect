@@ -186,7 +186,7 @@ The words in the `texting.txt` file are not compiled from any online source. The
 
 If you have any suggestions of other categories of words to add other than texting, feel free to let me know. I may consider creating the category to be just as usable as the texting file.
 
-As a side note, `compare.py` and `compare3.py`, as [files](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp/src/fq_hll) that are quite useful for comparing between intended outputs and actual outputs, can be used via 
+As a side note, `compare.cpp` and `compare3.cpp`, as [files](https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp/src/src) that are quite useful for comparing between intended outputs and actual outputs, can be used via 
 
 ```cpp
 // ======== AS OF RIGHT NOW WITHOUT CMAKE ======== //
