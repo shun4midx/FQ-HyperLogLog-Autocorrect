@@ -23,7 +23,7 @@ static const std::vector<std::string> addon_files = {"texting"};
 
 // ======== STRUCT ======== //
 typedef struct AutocorrectorCfg {
-    StrVec dictionary_list = std::filesystem::path("test_files") / "20k_shun4midx.txt";
+    StrVec dictionary_list = (std::filesystem::path("test_files") / "20k_shun4midx.txt").string();
     StrVec valid_letters = "a-z";
     StrVec keyboard = "qwerty";
     double alpha = 0.2;
@@ -65,7 +65,7 @@ class Autocorrector {
 public:
     explicit Autocorrector(AutocorrectorCfg& cfg);
     Autocorrector& operator=(const Autocorrector& ac) = default;
-    explicit Autocorrector(StrVec _dictionary_list = std::filesystem::path("test_files") / "20k_shun4midx.txt", StrVec _valid_letters = "a-z", StrVec _keyboard = "qwerty", double _alpha = 0.2, double _beta = 0.35, int _b = 10);
+    explicit Autocorrector(StrVec _dictionary_list = (std::filesystem::path("test_files") / "20k_shun4midx.txt").string(), StrVec _valid_letters = "a-z", StrVec _keyboard = "qwerty", double _alpha = 0.2, double _beta = 0.35, int _b = 10);
 
     void save_dictionary();
     void add_dictionary(StrVec to_be_added);
