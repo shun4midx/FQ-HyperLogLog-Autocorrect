@@ -6,8 +6,8 @@
  ****************************************** */
 
 #pragma once
-#include <FQ-HLL/Autocorrector.h>
-#include <FQ-HLL/compare.h>
-#include <FQ-HLL/compare3.h>
-#include <FQ-HLL/Hasher.h>
-#include <FQ-HLL/HyperLogLog.h>
+#include "Autocorrector.h"
+#include "compare.h"
+#include "compare3.h"
+#include "Hasher.h"
+#include "HyperLogLog.h"
