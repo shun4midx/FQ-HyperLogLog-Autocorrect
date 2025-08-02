@@ -75,7 +75,7 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  - If time permits, I may include a formal proof and potential developments in LDP.
 
 ## Current Repos using this FQ-HLL Library
- - [C++] FQ-HLL Keyboard: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development. The GitHub link will be provided once available.
+ - [C++] FQ-HLL Keyboard: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development with [Ducky](https://github.com/ducky4life). The GitHub link will be provided once available.
  - [Python] A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
  - [Python] An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
  - [Python] A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
