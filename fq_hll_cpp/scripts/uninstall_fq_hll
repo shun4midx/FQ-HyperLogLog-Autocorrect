@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "This will uninstall fq_hll from /usr/local."
+read -p "Are you sure? [Y/N]: " confirm
+
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    echo "Uninstall cancelled."
+    exit 1
+fi
+
+echo "Uninstalling..."
+
+sudo rm -rf /usr/local/include/FQ-HLL
+sudo rm -f /usr/local/lib/libfq_hll.a
+sudo rm -rf /usr/local/lib/cmake/fq_hll
+sudo rm -f /usr/local/bin/fq_hll_g++
+sudo rm -f /usr/local/bin/fq_hll_clang++
+
+echo "fq_hll uninstalled successfully."
