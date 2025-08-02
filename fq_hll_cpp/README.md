@@ -110,7 +110,7 @@ This script will prompt for confirmation and cleanly remove all installed files.
 * C++17-compatible compiler
 
 ## Notice for Beginners
-It is completely normal to maybe see your compiler perhaps underline code in red related to the FQ-HLL library. This is because your IntelliSense may not look for the `FQ-HyperLogLog-Autocorrect/fq_hll_cpp` directory. However, if the code compiles fine, then it is fine.
+It is completely normal to maybe see your code editor perhaps underline code in red related to the FQ-HLL library. This is because your IntelliSense may not look for the `FQ-HyperLogLog-Autocorrect/fq_hll_cpp` directory. However, if the code compiles fine, then it is fine.
 
 ## Usage
 The library defaults to searching within its own folder before searching in your local directory. There are two text files offered as base dictionaries: `20k_shun4midx.txt` and `database.txt`, with around 20000 and 400 words respectively. The below code would only visit the local directory. If no dictionary is specified, `20k_shun4midx.txt` would be used instead.
