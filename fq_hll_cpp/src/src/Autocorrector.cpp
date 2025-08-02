@@ -175,7 +175,7 @@ Autocorrector::Autocorrector(StrVec _dictionary_list, StrVec _valid_letters, Str
         
         // Addon files
         if (std::find(addon_files.begin(), addon_files.end(), key) != addon_files.end()) {
-            std::filesystem::path base_dir = std::filesystem::path(__FILE__).parent_path();
+            std::filesystem::path base_dir = std::filesystem::path(__FILE__).parent_path().parent_path();
             std::filesystem::path def_txt = base_dir / "test_files" / "20k_shun4midx.txt";
             std::filesystem::path add_txt = base_dir / "test_files" / (key + ".txt");
 
