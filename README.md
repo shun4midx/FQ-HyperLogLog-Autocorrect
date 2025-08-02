@@ -44,6 +44,13 @@ In `Python`, here is a rough total runtime of each algorithm to finish all queri
 
 Inspired by how autocorrection on mobile devices offer top 3 suggestions, I have also implemented a top3 function. For **Top 3** results, where accuracy is counted for the number of queries that have one correct answer in the top 3 suggested results, FQ-HLL was able to reach accuracies of **93~94%** and **75~76%** for `database.txt` and `20k_shun4midx.txt` respectively. The times they took are roughly 0.308s and 14.602s respectively.
 
+In `C++`, due to time constraints and the fact that Python demonstrated well enough the efficiency and relative accuracy of FQ-HLL, only FQ-HLL has been demonstrated here, and top3 results are as shown. Execution details are in the README file of `fq_hll_cpp`, most importantly, remember to use the `-O2` flag. The accuracy was unchanged.
+
+| Method        | `database.txt`      | `20k_shun4midx.txt` |
+| ------------- | ------------------- | ------------------- |
+| FQ-HLL (Auto) | 0.071s              | 2.649s              |
+| FQ-HLL (Top3) | 0.084s              | 3.716s              |
+
 Given the relatively small memory usage yet huge accuracy and its potential to have LDP, FQ-HLL is something worth considering for autocorrection algorithms.
 
 ## Remark on Keyboards
