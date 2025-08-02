@@ -103,7 +103,7 @@ cd FQ-HyperLogLog-Autocorrect/fq_hll_cpp/scripts
 ./uninstall_fq_hll
 ```
 
-This script will prompt for confirmation and cleanly remove all installed files.
+This script will prompt for confirmation and cleanly remove all installed files from CMake.
 
 ## Requirements
 * CMake >= 3.10
