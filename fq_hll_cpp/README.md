@@ -75,7 +75,7 @@ fq_hll_g++ <file_name>.cpp -o <file_exec>
 Or:
 
 ```bash
-fq_hll_clang++ <file_name>.cpp -o demo
+fq_hll_clang++ <file_name>.cpp -o <file_exec>
 ./<file_exec>
 ```
 
