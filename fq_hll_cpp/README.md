@@ -127,11 +127,11 @@ int main() {
     Autocorrector ac;
 
     // File
-    Result ans1 = ac.autocorrect("test_files/typo_file.txt", "test_files/class_suggestions.txt");
+    Result ans1 = ac.autocorrect("test_files/typo_file.txt", "outputs/class_suggestions.txt");
     // std::unordered_map<std::string, std::string> sug = ans1.suggestions;
     // std::unordered_map<std::string, double> score = ans1.scores;
 
-    Results ans2 = ac.top3("test_files/typo_file.txt", "test_files/class3_suggestions.txt");
+    Results ans2 = ac.top3("test_files/typo_file.txt", "outputs/class3_suggestions.txt");
 
     // Optionally, you can not want it to output it into a file, then:
     // Individual strings
