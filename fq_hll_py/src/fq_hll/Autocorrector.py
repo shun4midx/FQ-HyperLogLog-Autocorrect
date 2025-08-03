@@ -329,7 +329,8 @@ class Autocorrector:
         if print_times:
             self.save_dictionary()
 
-        queries, query_displays = load_words(queries_list)
+        queries_str, _ = load_words(queries_list)
+        queries = [(que.lower(), que) for que in queries_str]
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -338,16 +339,16 @@ class Autocorrector:
         suggestions = {} # Dictionary
         final_scores = {}
 
-        for query in queries:
+        for query, query_display in queries:
             if not self.is_valid(query):
                 if return_invalid_words:
-                    suggestions[query_displays[query]] = query_displays[query]
-                    final_scores[query_displays[query]] = 0.0
-                    output.append(query_displays[query])
+                    suggestions[query_display] = query_display
+                    final_scores[query_display] = 0.0
+                    output.append(query_display)
                     continue
                 else:
-                    suggestions[query_displays[query]] = ""
-                    final_scores[query_displays[query]] = 0.0
+                    suggestions[query_display] = ""
+                    final_scores[query_display] = 0.0
                     output.append("")
                     continue
 
@@ -382,16 +383,16 @@ class Autocorrector:
             if not cand_idxs:
                 if return_invalid_words:
                     if print_details:
-                        print(f"  -> no overlaps; returning original: {query_displays[query]}")
-                    suggestions[query_displays[query]] = query_displays[query]
-                    final_scores[query_displays[query]] = 0.0
-                    output.append(query_displays[query])
+                        print(f"  -> no overlaps; returning original: {query_display}")
+                    suggestions[query_display] = query_display
+                    final_scores[query_display] = 0.0
+                    output.append(query_display)
                     continue
                 else:
                     if print_details:
                         print("  -> no overlaps; returning empty")
-                    suggestions[query_displays[query]] = ""
-                    final_scores[query_displays[query]] = 0.0
+                    suggestions[query_display] = ""
+                    final_scores[query_display] = 0.0
                     output.append("")
                     continue
 
@@ -433,8 +434,8 @@ class Autocorrector:
                 print("-" * 30)
 
             displayed_picked = self.display_map.get(picked, picked)
-            suggestions[query_displays[query]] = displayed_picked
-            final_scores[query_displays[query]] = best_score
+            suggestions[query_display] = displayed_picked
+            final_scores[query_display] = best_score
             output.append(displayed_picked)
 
         # 4) Write out
@@ -459,7 +460,8 @@ class Autocorrector:
         if print_times:
             self.save_dictionary()
 
-        queries, query_displays = load_words(queries_list)
+        queries_str, _ = load_words(queries_list)
+        queries = [(que.lower(), que) for que in queries_str]
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -468,16 +470,16 @@ class Autocorrector:
         suggestions = {} # Dictionary
         final_scores = {}
 
-        for query in queries:
+        for query, query_display in queries:
             if not self.is_valid(query):
                 if return_invalid_words:
-                    suggestions[query_displays[query]] = [query_displays[query], "", ""]
-                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
-                    output.append(f"{query_displays[query]}  ")
+                    suggestions[query_display] = [query_display, "", ""]
+                    final_scores[query_display] = [0.0, 0.0, 0.0]
+                    output.append(f"{query_display}  ")
                     continue
                 else:
-                    suggestions[query_displays[query]] = ["", "", ""]
-                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
+                    suggestions[query_display] = ["", "", ""]
+                    final_scores[query_display] = [0.0, 0.0, 0.0]
                     output.append("")
                     continue
 
@@ -512,16 +514,16 @@ class Autocorrector:
             if not cand_idxs:
                 if return_invalid_words:
                     if print_details:
-                        print(f"  -> no overlaps; returning original: {query_displays[query]}  ")
-                    suggestions[query_displays[query]] = [query_displays[query], "", ""]
-                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
-                    output.append(f"{query_displays[query]}  ")
+                        print(f"  -> no overlaps; returning original: {query_display}  ")
+                    suggestions[query_display] = [query_display, "", ""]
+                    final_scores[query_display] = [0.0, 0.0, 0.0]
+                    output.append(f"{query_display}  ")
                     continue
                 else:
                     if print_details:
                         print("  -> no overlaps; returning empty")
-                    suggestions[query_displays[query]] = ["", "", ""]
-                    final_scores[query_displays[query]] = [0.0, 0.0, 0.0]
+                    suggestions[query_display] = ["", "", ""]
+                    final_scores[query_display] = [0.0, 0.0, 0.0]
                     output.append("")
                     continue
 
@@ -577,8 +579,8 @@ class Autocorrector:
                 print(f"{query:>12} -> top 3: {top3}")
                 print("-" * 30)
 
-            suggestions[query_displays[query]] = top3
-            final_scores[query_displays[query]] = top3_scores
+            suggestions[query_display] = top3
+            final_scores[query_display] = top3_scores
             output.append(" ".join(top3))
 
         # 4) Write out
