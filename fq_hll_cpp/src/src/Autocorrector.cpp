@@ -104,7 +104,7 @@ WordData load_words(StrVec sv, std::unordered_set<char> letters) {
     }
 }
 
-std::vector<std::pair<std::string, std::string>> load_queries(std::vector<std::string>& arr, std::unordered_set<char> letters = {}) {
+std::vector<std::pair<std::string, std::string>> load_queries(std::vector<std::string>& arr, std::unordered_set<char> letters) {
     std::vector<std::pair<std::string, std::string>> result;
 
     for (auto& raw : arr) {
@@ -122,7 +122,7 @@ std::vector<std::pair<std::string, std::string>> load_queries(std::vector<std::s
     return result;
 }
 
-std::vector<std::pair<std::string, std::string>> load_queries(std::string& str, std::unordered_set<char> letters = {}) { // Either is a file path or a single string input
+std::vector<std::pair<std::string, std::string>> load_queries(std::string& str, std::unordered_set<char> letters) { // Either is a file path or a single string input
     std::vector<std::string> raw;
 
     // Process
@@ -147,7 +147,7 @@ std::vector<std::pair<std::string, std::string>> load_queries(std::string& str, 
     return load_queries(raw, letters);
 }
 
-std::vector<std::pair<std::string, std::string>> load_queries(StrVec sv, std::unordered_set<char> letters = {}) {
+std::vector<std::pair<std::string, std::string>> load_queries(StrVec sv, std::unordered_set<char> letters) {
     if (auto svec = std::get_if<std::vector<std::string>>(&sv)) {
         return load_queries(*svec, letters);
     } else if (auto str = std::get_if<std::string>(&sv)) {
