@@ -104,6 +104,59 @@ WordData load_words(StrVec sv, std::unordered_set<char> letters) {
     }
 }
 
+std::vector<std::pair<std::string, std::string>> load_queries(std::vector<std::string>& arr, std::unordered_set<char> letters = {}) {
+    std::vector<std::pair<std::string, std::string>> result;
+
+    for (auto& raw : arr) {
+        if (!is_valid(raw, letters)) {
+            continue;
+        }
+
+        std::string lower;
+        lower.reserve(raw.size());
+        std::transform(raw.begin(), raw.end(), std::back_inserter(lower), [](unsigned char c){ return std::tolower(c); });
+
+        result.push_back({lower, raw});
+    }
+
+    return result;
+}
+
+std::vector<std::pair<std::string, std::string>> load_queries(std::string& str, std::unordered_set<char> letters = {}) { // Either is a file path or a single string input
+    std::vector<std::string> raw;
+
+    // Process
+    std::filesystem::path p{str};
+    if (std::filesystem::exists(p) && std::filesystem::is_regular_file(p)) {
+        std::ifstream in{p};
+        if (!in) {
+            throw std::runtime_error("Cannot open dictionary file: " + str);
+        }
+        
+        std::string line;
+        while (std::getline(in, line)) {
+            if (!line.empty()) {
+                raw.push_back(line);
+            }
+        }
+    } else { // Treat the string as one word
+        raw.push_back(str);
+    }
+
+    // Call
+    return load_queries(raw, letters);
+}
+
+std::vector<std::pair<std::string, std::string>> load_queries(StrVec sv, std::unordered_set<char> letters = {}) {
+    if (auto svec = std::get_if<std::vector<std::string>>(&sv)) {
+        return load_queries(*svec, letters);
+    } else if (auto str = std::get_if<std::string>(&sv)) {
+        return load_queries(*str, letters);
+    } else { // Fallback
+        return {};
+    }
+}
+
 inline int popcount64(uint64_t x) { 
     return __builtin_popcountll(x);
 }
@@ -498,15 +551,7 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
         save_dictionary();
     }
 
-    WordData worddata = load_words(queries_list);
-    std::vector<std::string> queries_str = worddata.words;
-    std::vector<std::pair<std::string, std::string>> queries;
-    for (auto& raw : queries_str) {
-        std::string lower;
-        lower.reserve(raw.size());
-        std::transform(raw.begin(), raw.end(), std::back_inserter(lower), [](unsigned char c){ return std::tolower(c); });
-        queries.emplace_back(lower, raw);
-    }
+    std::vector<std::pair<std::string, std::string>> queries = load_queries(queries_list);
 
     // 3) Process queries
     t2 = std::chrono::steady_clock::now();
@@ -729,15 +774,7 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
         save_dictionary();
     }
 
-    WordData worddata = load_words(queries_list);
-    std::vector<std::string> queries_str = worddata.words;
-    std::vector<std::pair<std::string, std::string>> queries;
-    for (auto& raw : queries_str) {
-        std::string lower;
-        lower.reserve(raw.size());
-        std::transform(raw.begin(), raw.end(), std::back_inserter(lower), [](unsigned char c){ return std::tolower(c); });
-        queries.emplace_back(lower, raw);
-    }
+    std::vector<std::pair<std::string, std::string>> queries = load_queries(queries_list);
 
     // 3) Process queries
     t2 = std::chrono::steady_clock::now();

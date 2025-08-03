@@ -58,6 +58,11 @@ bool is_valid(std::string& word, std::unordered_set<char> letters = {});
 WordData load_words(std::vector<std::string>& arr, std::unordered_set<char> letters = {});
 WordData load_words(std::string& str, std::unordered_set<char> letters = {}); // Either is a file path or a single string input
 WordData load_words(StrVec sv, std::unordered_set<char> letters = {});
+
+std::vector<std::pair<std::string, std::string>> load_queries(std::vector<std::string>& arr, std::unordered_set<char> letters = {});
+std::vector<std::pair<std::string, std::string>> load_queries(std::string& str, std::unordered_set<char> letters = {}); // Either is a file path or a single string input
+std::vector<std::pair<std::string, std::string>> load_queries(StrVec sv, std::unordered_set<char> letters = {});
+
 inline int popcount64(uint64_t x);
 
 // ======== CLASS ======== //
