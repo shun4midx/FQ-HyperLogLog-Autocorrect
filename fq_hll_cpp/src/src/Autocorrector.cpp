@@ -337,7 +337,7 @@ void Autocorrector::save_dictionary() {
     }
 }
 
-void Autocorrector::add_dictionary(StrVec to_be_added) {
+std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
     WordData worddata = load_words(to_be_added, letters);
 
     std::vector<std::string> words = worddata.words;
@@ -354,7 +354,7 @@ void Autocorrector::add_dictionary(StrVec to_be_added) {
     }
 
     if (added.empty()) {
-        return;
+        return added;
     }
 
     int old_exp = std::log2(NUM_BUCKETS);
@@ -370,7 +370,7 @@ void Autocorrector::add_dictionary(StrVec to_be_added) {
 
         save_dictionary();
 
-        return;
+        return added;
     }
 
     // 2) Otherwise true O(1) per-word work:
@@ -444,15 +444,20 @@ void Autocorrector::add_dictionary(StrVec to_be_added) {
     
         word_bits.push_back(std::move(ba));
     }
+
+    return added;
 }
 
-void Autocorrector::remove_dictionary(StrVec to_be_removed) {
+std::vector<std::string> Autocorrector::remove_dictionary(StrVec to_be_removed) {
     WordData tbr = load_words(to_be_removed, letters);
     std::vector<std::string> words = tbr.words;
+
+    std::vector<std::string> removed;
 
     for (auto& word : words) {
         if (word_set.find(word) != word_set.end()) {
             removed_words.insert(word);
+            removed.push_back(word);
         }
     }
 
@@ -475,6 +480,8 @@ void Autocorrector::remove_dictionary(StrVec to_be_removed) {
         removed_words.clear();
         save_dictionary();
     }
+
+    return removed;
 }
 
 Result Autocorrector::autocorrect(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file, bool use_keyboard, bool return_invalid_words, bool print_details, bool print_times) {
