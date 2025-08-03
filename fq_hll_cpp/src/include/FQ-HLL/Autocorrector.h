@@ -68,8 +68,8 @@ public:
     explicit Autocorrector(StrVec _dictionary_list = (std::filesystem::path("test_files") / "20k_shun4midx.txt").string(), StrVec _valid_letters = "a-z", StrVec _keyboard = "qwerty", double _alpha = 0.2, double _beta = 0.35, int _b = 10);
 
     void save_dictionary();
-    void add_dictionary(StrVec to_be_added);
-    void remove_dictionary(StrVec to_be_removed);
+    std::vector<std::string> add_dictionary(StrVec to_be_added);
+    std::vector<std::string> remove_dictionary(StrVec to_be_removed);
 
     Result autocorrect(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
     Results top3(const std::initializer_list<std::string> queries_list, std::filesystem::path output_file = "None", bool use_keyboard = true, bool return_invalid_words = true, bool print_details = false, bool print_times = false);
