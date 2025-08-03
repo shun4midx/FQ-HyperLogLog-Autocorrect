@@ -240,7 +240,7 @@ Autocorrector::Autocorrector(StrVec _dictionary_list, StrVec _valid_letters, Str
     word_set.clear();
     word_set.reserve(word_dict.size());
 
-    for (auto &w : word_dict) {
+    for (auto& w : word_dict) {
         word_set.insert(w);
     }
 
@@ -315,12 +315,12 @@ void Autocorrector::save_dictionary() {
     word_bits.reserve(word_dict.size());
 
     for (size_t i = 0; i < word_dict.size(); ++i) {
-        const auto &word = word_dict[i];
+        const auto& word = word_dict[i];
 
         std::vector<uint64_t> ba(blocks, 0ULL);
 
         auto qgrams = extract_qgrams(word_dict[i], q, false);
-        for (auto &gram : qgrams) {
+        for (auto& gram : qgrams) {
             auto it = qgram_idx.find(gram);
 
             if (it == qgram_idx.end()) {
@@ -392,7 +392,7 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
 
         for (auto& gram : qgrams) {
             auto [it, inserted] = qgram_sketches.try_emplace(gram, cfg);
-            HyperLogLog &sketch = it->second;
+            HyperLogLog& sketch = it->second;
 
             sketch.shifted_insert(gram + "_" + added[i], shift);
         }
@@ -401,7 +401,7 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
     // If new qgrams appeared, extend existing bitarrays by zeros
     std::vector<std::string> new_all;
     new_all.reserve(qgram_sketches.size());
-    for (auto &kv : qgram_sketches) {
+    for (auto& kv : qgram_sketches) {
         new_all.push_back(kv.first);
     }
     std::sort(new_all.begin(), new_all.end());
@@ -499,8 +499,14 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
     }
 
     WordData worddata = load_words(queries_list);
-    std::vector<std::string> queries = worddata.words;
-    std::unordered_map<std::string, std::string> query_displays = worddata.display;
+    std::vector<std::string> queries_str = worddata.words;
+    std::vector<std::pair<std::string, std::string>> queries;
+    for (auto& raw : queries_str) {
+        std::string lower;
+        lower.reserve(raw.size());
+        std::transform(raw.begin(), raw.end(), std::back_inserter(lower), [](unsigned char c){ return std::tolower(c); });
+        queries.emplace_back(lower, raw);
+    }
 
     // 3) Process queries
     t2 = std::chrono::steady_clock::now();
@@ -509,16 +515,16 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
     std::unordered_map<std::string, std::string> suggestions;
     std::unordered_map<std::string, double> final_scores;
 
-    for (auto& query : queries) {
+    for (auto& [query, query_display] : queries) {
         if (!is_valid(query)) {
             if (return_invalid_words) {
-                suggestions[query_displays[query]] = query_displays[query];
-                final_scores[query_displays[query]] = 0.0;
-                output.push_back(query_displays[query]);
+                suggestions[query_display] = query_display;
+                final_scores[query_display] = 0.0;
+                output.push_back(query_display);
                 continue;
             } else {
-                suggestions[query_displays[query]] = "";
-                final_scores[query_displays[query]] = 0.0;
+                suggestions[query_display] = "";
+                final_scores[query_display] = 0.0;
                 output.push_back("");
                 continue;
             }
@@ -569,7 +575,7 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
                 continue;
             }
 
-            auto &wb = word_bits[idx];
+            auto& wb = word_bits[idx];
             int inter = 0;
             for (int b = 0; b < blocks; ++b) {
                 inter += popcount64(wb[b] & qb[b]);
@@ -583,18 +589,18 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
         if (cand_idxs.empty()) {
             if (return_invalid_words) {
                 if (print_details) {
-                    std::cout << "  -> no overlaps; returning original: " << query_displays[query] << std::endl;
+                    std::cout << "  -> no overlaps; returning original: " << query_display << std::endl;
                 }
-                suggestions[query_displays[query]] = query_displays[query];
-                final_scores[query_displays[query]] = 0.0;
-                output.push_back(query_displays[query]);
+                suggestions[query_display] = query_display;
+                final_scores[query_display] = 0.0;
+                output.push_back(query_display);
                 continue;
             } else {
                 if (print_details) {
                     std::cout << "  -> no overlaps; returning empty" << std::endl;
                 }
-                suggestions[query_displays[query]] = "";
-                final_scores[query_displays[query]] = 0.0;
+                suggestions[query_display] = "";
+                final_scores[query_display] = 0.0;
                 output.push_back("");
                 continue;
             }
@@ -675,8 +681,8 @@ Result Autocorrector::autocorrect(const StrVec& queries_list, std::filesystem::p
             displayed_picked = picked;
         }
 
-        suggestions[query_displays[query]] = displayed_picked;
-        final_scores[query_displays[query]] = best_score;
+        suggestions[query_display] = displayed_picked;
+        final_scores[query_display] = best_score;
         output.push_back(displayed_picked);
     }
 
@@ -724,8 +730,14 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
     }
 
     WordData worddata = load_words(queries_list);
-    std::vector<std::string> queries = worddata.words;
-    std::unordered_map<std::string, std::string> query_displays = worddata.display;
+    std::vector<std::string> queries_str = worddata.words;
+    std::vector<std::pair<std::string, std::string>> queries;
+    for (auto& raw : queries_str) {
+        std::string lower;
+        lower.reserve(raw.size());
+        std::transform(raw.begin(), raw.end(), std::back_inserter(lower), [](unsigned char c){ return std::tolower(c); });
+        queries.emplace_back(lower, raw);
+    }
 
     // 3) Process queries
     t2 = std::chrono::steady_clock::now();
@@ -734,16 +746,16 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
     std::unordered_map<std::string, std::vector<std::string>> suggestions;
     std::unordered_map<std::string, std::vector<double>> final_scores;
 
-    for (auto& query : queries) {
+    for (auto& [query, query_display] : queries) {
         if (!is_valid(query)) {
             if (return_invalid_words) {
-                suggestions[query_displays[query]] = {query_displays[query], "", ""};
-                final_scores[query_displays[query]] = {0.0, 0.0, 0.0};
-                output.push_back(query_displays[query] + "  ");
+                suggestions[query_display] = {query_display, "", ""};
+                final_scores[query_display] = {0.0, 0.0, 0.0};
+                output.push_back(query_display + "  ");
                 continue;
             } else {
-                suggestions[query_displays[query]] = {"", "", ""};
-                final_scores[query_displays[query]] = {0.0, 0.0, 0.0};
+                suggestions[query_display] = {"", "", ""};
+                final_scores[query_display] = {0.0, 0.0, 0.0};
                 output.push_back("");
                 continue;
             }
@@ -794,7 +806,7 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
                 continue;
             }
 
-            auto &wb = word_bits[idx];
+            auto& wb = word_bits[idx];
             int inter = 0;
             for (int b = 0; b < blocks; ++b) {
                 inter += popcount64(wb[b] & qb[b]);
@@ -808,18 +820,18 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
         if (cand_idxs.empty()) {
             if (return_invalid_words) {
                 if (print_details) {
-                    std::cout << "  -> no overlaps; returning original: " << query_displays[query] << "  " << std::endl;
+                    std::cout << "  -> no overlaps; returning original: " << query_display << "  " << std::endl;
                 }
-                suggestions[query_displays[query]] = {query_displays[query], "", ""};
-                final_scores[query_displays[query]] = {0.0, 0.0, 0.0};
-                output.push_back(query_displays[query] + "  ");
+                suggestions[query_display] = {query_display, "", ""};
+                final_scores[query_display] = {0.0, 0.0, 0.0};
+                output.push_back(query_display + "  ");
                 continue;
             } else {
                 if (print_details) {
                     std::cout << "  -> no overlaps; returning empty" << std::endl;
                 }
-                suggestions[query_displays[query]] = {"", "", ""};
-                final_scores[query_displays[query]] = {0.0, 0.0, 0.0};
+                suggestions[query_display] = {"", "", ""};
+                final_scores[query_display] = {0.0, 0.0, 0.0};
                 output.push_back("");
                 continue;
             }
@@ -851,7 +863,7 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
 
         // Take only the top-`shortlist` by base_score
         std::sort(scored.begin(), scored.end(),
-            [](auto const &a, auto const &b){
+            [](auto const& a, auto const& b){
                 return a.first > b.first; // Desc
             }
         );
@@ -876,7 +888,7 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
 
         // Sort and return top 3
         std::sort(final.begin(), final.end(),
-            [](auto const &a, auto const &b){
+            [](auto const& a, auto const& b){
                 return a.first > b.first; // Desc
             }
         );
@@ -909,8 +921,8 @@ Results Autocorrector::top3(const StrVec& queries_list, std::filesystem::path ou
             std::cout << std::string(30, '-') << std::endl;
         }
 
-        suggestions[query_displays[query]] = top3;
-        final_scores[query_displays[query]] = top3_scores;
+        suggestions[query_display] = top3;
+        final_scores[query_display] = top3_scores;
         output.push_back(top3[0] + " " + top3[1] + " " + top3[2]);
     }
 
