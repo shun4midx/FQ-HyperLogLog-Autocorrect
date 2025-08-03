@@ -73,6 +73,34 @@ def load_words(src, letters=None):
     
     return words, display
 
+def load_queries(src, letters=None):
+    """
+    src: either
+      * a list/tuple of words
+      * a filename (one word per line)
+      * a string
+    return_display: if True, also return {lowercase: original} map
+    """
+    # 1) Already a Python sequence?
+    if isinstance(src, (list, tuple)):
+        raw = src
+
+    # 2) File on disk?
+    elif isinstance(src, str) and os.path.isfile(src):
+        with open(src, 'r', encoding='utf-8') as f:
+            raw = [line.strip() for line in f if line.strip()]
+
+    # 3) String?
+    elif isinstance(src, str):
+        raw = [src]
+
+    else:
+        raise ValueError(f"`src` ({src}) must be a list/tuple, a path, or a string")
+
+    # Now raw is a list of original words
+    
+    return [(word, word.lower()) for word in raw]
+
 addon_files = ["texting"] # Files to addon 20k_shun4midx.txt
 
 @dataclass
@@ -329,8 +357,7 @@ class Autocorrector:
         if print_times:
             self.save_dictionary()
 
-        queries_str, _ = load_words(queries_list)
-        queries = [(que.lower(), que) for que in queries_str]
+        queries = load_queries(queries_list)
 
         # 3) Process queries
         self.t2 = time.perf_counter()
@@ -460,8 +487,7 @@ class Autocorrector:
         if print_times:
             self.save_dictionary()
 
-        queries_str, _ = load_words(queries_list)
-        queries = [(que.lower(), que) for que in queries_str]
+        queries = load_queries(queries_list)
 
         # 3) Process queries
         self.t2 = time.perf_counter()
