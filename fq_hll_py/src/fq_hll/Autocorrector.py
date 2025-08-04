@@ -276,12 +276,14 @@ class Autocorrector:
     def add_dictionary(self, to_be_added):
         words, displays = load_words(to_be_added, self.letters)
         added = []
+        remove_added = []
 
         for word in words:
             if word not in self.word_dict:
                 added.append(word)
             else:
                 self.removed_words.discard(word)
+                remove_added.append(word)
 
         if not added:
             return added
@@ -331,6 +333,9 @@ class Autocorrector:
             for gram in extract_qgrams(w, self.q, fuzzier=False):
                 ba[self.qgram_idx[gram]] = 1
             self.word_bits.append(ba)
+
+        for w in remove_added:
+            added.append(w)
 
         return added
 
