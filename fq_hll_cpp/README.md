@@ -207,7 +207,7 @@ Notice, these keyboards are accessible in `C++` for example via:
 ```cpp
 AutocorrectorCfg cfg;
 cfg.keyboard = "qwerty";
-Autocorrector ac = Autocorrection(cfg);
+Autocorrector ac(cfg);
 ```
 
 or
@@ -215,5 +215,5 @@ or
 ```cpp
 AutocorrectorCfg cfg;
 cfg.keyboard = std::vector<std::string>{"custom_row1", "custom_row2", etc};
-Autocorrector ac = Autocorrection(cfg);
+Autocorrector ac(cfg);
 ```
