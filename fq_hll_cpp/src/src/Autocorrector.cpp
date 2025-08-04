@@ -409,7 +409,7 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
     }
 
     if (added.empty()) {
-        return added;
+        return remove_added;
     }
 
     int old_exp = std::log2(NUM_BUCKETS);
@@ -424,6 +424,10 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
         }
 
         save_dictionary();
+
+        for (std::string& str : remove_added) {
+            added.push_back(str);
+        }
 
         return added;
     }

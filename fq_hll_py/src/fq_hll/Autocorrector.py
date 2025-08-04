@@ -286,7 +286,7 @@ class Autocorrector:
                 remove_added.append(word)
 
         if not added:
-            return added
+            return remove_added
 
         old_exp = int(math.log2(self.NUM_BUCKETS))
         new_exp = math.ceil(math.log2(len(self.word_dict) + len(added)) / 2)
@@ -297,6 +297,10 @@ class Autocorrector:
             for word in added:
                 self.display_map[word] = displays[word]
             self.save_dictionary()
+
+            for w in remove_added:
+                added.append(w)
+
             return added
 
         # 2) Otherwise true O(1) per‑word work:
