@@ -397,12 +397,14 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
     std::unordered_map<std::string, std::string> displays = worddata.display;
     
     std::vector<std::string> added;
+    std::vector<std::string> remove_added;
 
     for (auto& word : words) {
         if (word_set.find(word) == word_set.end()) {
             added.push_back(word);
         } else {
             removed_words.erase(word);
+            remove_added.push_back(word);
         }
     }
 
@@ -496,6 +498,10 @@ std::vector<std::string> Autocorrector::add_dictionary(StrVec to_be_added) {
         }
     
         word_bits.push_back(std::move(ba));
+    }
+
+    for (std::string& str : remove_added) {
+        added.push_back(str);
     }
 
     return added;
