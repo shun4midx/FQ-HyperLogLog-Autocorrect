@@ -290,7 +290,7 @@ We evaluate FQ-HLL autocorrection using the \texttt{typo\_file.txt} dataset deri
   \item \textbf{\texttt{20k\_shun4midx.txt}} --- The 20{,}000 most common English words\footnote{\url{https://github.com/first20hours/google-10000-english/blob/master/20k.txt}} placed before the words from \texttt{database.txt}, forcing intended corrections to be ranked lower by frequency bias, and thus disadvantaging the results.
 \end{itemize}
 
-Accuracy is defined strictly: a prediction is correct only if it exactly matches the intended target word. For example, for the typo ``mant'', even if our algorithm suggests ``many'', if the intended answer was ``want'', we still count it as wrong. We also measure \textbf{Top-3 accuracy}, where a prediction is counted correct if the intended word appears in the first three suggestions.
+Accuracy is defined strictly: a prediction is correct only if it exactly matches the intended target word. For example, for the typo ``mant'', even if our algorithm suggests ``many'', if the intended answer was ``want'', we still count it as wrong. We also measure \textbf{Top-3 accuracy}, where a prediction is counted correct if the intended word appears in the first three suggestions. We also defaulted $\alpha$ to 0.2, and $b$ (for HLL) to 10.
 
 \paragraph{Python Implementation}
 On \texttt{database.txt}, FQ-HLL achieved \textbf{87-88\%} Top-1 accuracy and \textbf{93-94\%} Top-3 accuracy, with total runtime $0.223$\,s. On \texttt{20k\_shun4midx.txt}, accuracy dropped to \textbf{59-60\%} (Top-1) and \textbf{75-76\%} (Top-3) with runtime $9.955$\,s. \newline
@@ -311,10 +311,10 @@ For comparison, a BK-tree with Levenshtein edit distance $\leq 2$ scored \textbf
 \end{center}
 
 \paragraph{C++ Implementation}
-C++ FQ-HLL produced identical accuracy to Python but with significantly faster runtimes: $0.071$\,s (\texttt{database.txt}) and $2.649$\,s (\texttt{20k\_shun4midx.txt}) for Top-1; $0.084$\,s and $3.716$\,s for Top-3.
+C++ produced identical accuracy to Python but with significantly faster runtimes: $0.071$\,s (\texttt{database.txt}) and $2.649$\,s (\texttt{20k\_shun4midx.txt}) for Top-1; $0.084$\,s and $3.716$\,s for Top-3.
 
 \paragraph{Remark on Keyboard-Aware Mode}
-We optionally incorporate keyboard layout distance into the scoring function. On \texttt{20k\_shun4midx.txt}, this increases accuracy to \textbf{64-65\%} (Top-1) and \textbf{80-81\%} (Top-3) with only $\sim$1\,s additional runtime. However, the core results above are layout-agnostic, demonstrating FQ-HLL's strength without keyboard-specific information. \newline
+We optionally incorporate keyboard layout distance into the scoring function, with $\beta$ defaulted to 0.35. On \texttt{20k\_shun4midx.txt}, this increases accuracy to \textbf{64-65\%} (Top-1) and \textbf{80-81\%} (Top-3) with only $\sim$1\,s additional runtime. However, the core results above are layout-agnostic, demonstrating FQ-HLL's strength without keyboard-specific information. \newline
 
 \bluebox{\section{Workarounds --- Amortized $O(1)$ Addition and Deletion}}
 % Deletion or smth and also the O(1) addition/deletion and its caveats with save_dictionary()
