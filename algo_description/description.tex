@@ -1,0 +1,523 @@
+\documentclass[12pt,a4paper]{article}
+\input{shun4imports}
+\input{shun4colors}
+
+\lhead{FQ-HLL Autocorrection}
+\chead{Algorithm Description}
+\rhead{Shun (@shun4midx)}
+
+\begin{document}
+\begin{center}
+  {\Large \bf Frequency-Quantized HyperLogLog Autocorrection}\\[12pt]
+  \textbf{Author:} Shun (@shun4midx)
+\end{center}
+
+\bluebox{\section{Introduction}}
+
+\purplebox{\subsection{What is HyperLogLog?}}
+``HyperLogLog'', also stylized as \textsc{HyperLogLog} and abbreviated as HLL, is a very space-efficient probabilistic data sketch originally designed for estimating cardinality (number of distinct elements) of a multiset with sublinear memory, introduced in the paper \cite{fla+07}. Instead of storing all observed elements, HLL maintains an array of small registers, each storing the index of the leftmost \texttt{1}-bit in the hashed value of elements assigned to that register. From the distribution of these values, it estimates with high probability the cardinality with minimal memory overhead. \newline
+
+\pinkbox{HyperLogLog Properties}{\noindent The key properties of HLL that are important in most algorithms incorporating it are:
+\begin{itemize}
+  \item \textbf{Memory efficiency:} The structure requires only $O(m)$ space for $m$ registers,
+  typically a few kilobytes even for large datasets.
+  \item \textbf{Probabilistic accuracy:} The relative error is approximately $\frac{1.04}{\sqrt{m}}$ \cite{fla+07},
+  which can be tuned by adjusting the number of registers.
+  \item \textbf{Mergeability:} Two HLL sketches built on different datasets
+  can be combined in $O(m)$ time to produce a sketch for the union of both datasets.
+\end{itemize}}
+
+These properties make HLL a strong candidate for large-scale approximate matching problems, which is related to autocorrection. In this algorithm, memory efficiency and probabilistic accuracy are the most important parts of HLL. Mergeability is a theoretical property of HLL that we do not currently use, but will be useful for future development. \newline
+
+\purplebox{\subsection{Inspiration for HyperLogLog Autocorrection}}
+% Include description of fuzzy matching and need for low memory
+With increasing need for efficient and scalable data processing in autocorrection, traditional linear memory counting models are often impractical due to their computational overhead. Hence, approximate counting techniques must overcome these constraints. One of the most promising approximate counting techniques useful to autocorrection is fuzzy counting, which allows for approximate matching of data items. \newline
+
+\pinkbox{Definition for Fuzzy Counting}{Formally, let $\mathcal{D} = \{w_1, w_2, \dots, w_n\}$ be a multiset of strings from a finite alphabet $\Sigma$, and let $Q \in \Sigma^*$ be a query string. A fuzzy count function $f(Q)$ returns the number of elements $w_i \in \mathcal{D}$ such that $\boxed{\text{sim}(Q, w_i) \geq \theta}$ , where $\text{sim}: \Sigma^* \times \Sigma^* \to [0, 1]$ is a similarity function such as normalized edit distance or Jaccard similarity, and $\theta \in (0, 1]$ is a predefined similarity threshold.}
+
+Of course this accommodates typos, but fuzzy counting with limited memory and low latency while maintaining accuracy, is a significant challenge, unless we use the efficient probabilistic data structure HLL. \newline
+
+\purplebox{\subsection{From Cardinality to Autocorrection}}
+% Cardinality counter, how is autocorrection related to cardinality? 
+However, traditionally, HLL is not used for such natural language processing problems, and is only a cardinality estimator. There does not seem to be an evident link between HLL and autocorrection on the surface. \newline
+
+Hence, this work thinks of autocorrection in a different light. ``Autocorrection'' alone as a term is quite vague, but an angle to tackle it is viewing it as a problem of finding the optimal $w_i \in \mathcal{D}$, such that it has most fuzzy matching q-grams (substrings of length $q$) with the query $Q \in \Sigma^*$. Here, we define the fuzzy matching function $f(Q)$ to check for only Levenshtein edit distance of at most 1, \textbf{allowing replacing or swapping, but no deletion} --- a choice that mirrors how dyslexic people process new words as an overall impression rather than letter by letter in order. In other words, it's similar to a dyslexic person scanning $Q$ and determining if it visually ``roughly'' matches another word. \newline
+
+While conventional autocorrection algorithms may incidentally accommodate certain transpositions or shape-based similarities (such as Damerau-Levenshtein, q-gram overlap), they typically do not prioritize this matching pattern. Our approach deliberately models it as the primary similarity measure, motivated by the author's own reading patterns with dyslexia. \newline
+
+\pinkbox{Key Insight}{If we do so and we treat each fuzzy q-gram as a separate ``signal'', HLL can estimate which ``signals'' are used by the most $w_i \in \mathcal{D}$. With its low memory and time efficiency with our reinterpretation of what autocorrection is, HLL seems to be able to be a great candidate for an autocorrection algorithm.}
+
+\vspace{1.0em}\bluebox{\section{Weighting: Frequency-Quantization and Tie-Breakers}}
+Of course, alone as HLL, it does not immediately accurately approximate language, let alone with natural language processing tasks such as autocorrection. To have a more accurate representation of language, we would need to account for word frequencies, for example, the typo ``applw'' is very likely ``apple'' rather than ``appl'' even if both are words. However, how would we do so when we do not know exactly the frequency of each word, like in real world scenarios? Especially due to memory and time concerns, we cannot simply rely on repeated inserts (with slight variations each time, because HLL is a distinct object counter) into a sketch, how else can we approximate frequency? \newline
+
+\purplebox{\subsection{Zipfian Distribution}}
+Usually, even without knowing the exact frequencies of words, users can roughly arrange the relative frequencies of words, for example, it is clear ``the'' is more common than the word ``algorithm''. Zipf's law suggests the frequency usage of words in any language would naturally follow a Zipfian distribution, which is when a list of words is ranked in order from most to least frequent, \textbf{word position is inversely proportional to frequency}. \newline
+
+\pinkbox{Zipf's Law}{Formally, if the most frequent word has an estimated frequency $f_1$, then the $n$-th ranked word would have frequency approximately $\frac{f_1}{n}$.}
+
+\pinkbox{Zipf's Law Application in our Algorithm}{In practice, this means we can simply allow a user to input a list of words from most to least frequent, and estimate the relative frequencies of each word. To avoid making frequency adjustments too unbelievable, we divide the list of words into different buckets, and use Zipf's law according to bucket rank rather than word rank, so each word in the same bucket has the same estimated frequency.}
+
+This property is especially useful for FQ-HLL autocorrection, since it allows frequency quantization without having to explicitly store every individual count. With the rank-based frequency estimate, the algorithm can assign weights to candidate words in a way that closely mimics natural language usage, while still keeping the memory footprint extremely small. In our implementation, we set the number of buckets to be approximately the square root of the total number of words. This heuristic balances the granularity of frequency ranking (more buckets give finer distinction) with the extra memory required for storing more sketches. \newline
+
+\purplebox{\subsection{Frequency-Quantized HyperLogLog}} % Talk about the frequency thing here with 1/2 stuff
+Traditionally, HLL stores, for each register, the maximum $\rho$ value observed, where $\rho(w)$ follows a geometric distribution: the probability that the first \texttt{1} occurs at position $k$ is $p = 2^{-k}$. Interpreting this as repeated Bernoulli trials with ``success'' = ``bit is 1'' gives $\rho(w) \approx \lfloor \log_2 p \rfloor$. In cardinality estimation, these large $\rho$ values are rare and therefore signal the presence of many distinct elements. \newline
+
+\textbf{Frequency-Quantized HLL (FQ-HLL)} uses this to its advantage by introducing a small shift to the stored $\rho$ value based on the frequency of the q-gram. Since $\rho$ already acts like a $\log_2$-scaled frequency indicator, we can bias the register upward for items that are common via shifting $\rho$ when inserting values. \newline
+
+\pinkbox{FQ-HLL Key Idea}{Formally, instead of storing
+\[
+R_j \leftarrow \max(R_j,\, \rho(w)),
+\]
+we store
+\[
+R_j \leftarrow \max(R_j,\, \rho(w) + s(w)),
+\]
+where $s(w) \in \mathbb{Z}$ is a small shift based on the q-gram's estimated frequency rank. More common q-grams receive larger $s(w)$ values, so their $\rho$ is boosted more, giving them greater influence during autocorrection scoring. The specific way $s(w)$ is calculated can vary by implementation\, but it is always chosen to be small (bounded by the register's maximum value) so the extra memory cost is negligible.}
+
+Since the implied weight of a q-gram in HLL is proportional to $2^{\rho(w)}$, adding a constant shift $s(w)$ gives: $2^{\rho(w) + s(w)} = 2^{\rho(w)} \cdot 2^{s(w)}$. Thus, the shift simply multiplies the implied weight by the fixed factor $2^{s(w)}$, making it both interpretable and computationally cheap. This preserves HLL's sublinear memory and $O(1)$ update time while biasing the sketch to give \textbf{frequent} q-grams proportionally more weight during candidate ranking. \newline
+
+\purplebox{\subsection{Jaccard Index and Bitvector Encoding}}
+However, most importantly, we require a standardized way to determine the level of ``fuzzy matching'' between a query $Q$ and a word $w_i$. Thus, on top of using the fuzzy similarity introduced earlier, we could use the Jaccard similarity index. \newline
+
+\pinkbox{Jaccard Index Definition}{The Jaccard Index is a measure of set similarity defined as the ratio of the intersection size to the union size of two sets, where higher Jaccard Index corresponds to higher similarity:
+\[
+J(A, B) = \frac{|A \cap B|}{|A \cup B|}.
+\]}
+
+In this algorithm, $A$ will be the set of q-grams (including fuzzy matches) extracted from the query, and $B$ will be the set of q-grams (including fuzzy matches) for a candidate word. \newline
+
+\pinkbox{Bitvector Encoding in this Algorithm}{If we rely on \textbf{bitvector encoding} on sets of q-grams (encoding bits with \texttt{1} if the corresponding q-gram is present and \texttt{0} otherwise), we could compute the \textbf{intersection} size simply via a \textbf{bitwise AND}, and determine its size by counting the number of \texttt{1} bits, also known as \texttt{popcount}.}
+
+Moreover, by the inclusion-exclusion principle, their union size equals $\boxed{|A| + |B| - |A \cap B|}$ . This representation enables Jaccard similarity to be computed in $O(1)$ with respect to the number of registers, avoiding expensive string comparisons while still supporting fuzzy matching with low time overhead. \newline
+
+\bluebox{\section{Main Algorithms}}
+\purplebox{\subsection{Overall Picture}} % Rough description in English
+From Section 2, we already have a general idea of how our FQ-HLL algorithm functions. With Zipf's Law and FQ-HLL, we can insert words in a dictionary into different sets of HLL sketches per each q-gram of the dictionary. Then, using Jaccard similarity via bitvector encoding, we can determine the degree of fuzzy matching of each $w_i$ with respect to $Q$. Finally, we select the highest score candidate, based on Jaccard index and frequency. In fact, at a high level, FQ-HLL autocorrection functions as follows: \newline
+
+\pinkbox{FQ-HLL Autocorrection's Overall Picture}{
+\begin{enumerate}
+  \item \textbf{Extract normalized q-grams} from the query and each dictionary word, allowing fuzzy matches (edit distance $\leq 1$) that align with the dyslexia-oriented similarity model.  
+  \emph{This preserves the overall structure of the word even when minor typos are present.}
+  
+  \item \textbf{Insert q-grams into an FQ-HLL sketch}, applying a small bias $s(w)$ based on the word's Zipf-ordered frequency rank relative to bucket rank.  
+  \emph{This frequency quantization gives more common words proportionally higher influence without extra memory.}
+  
+  \item \textbf{Encode each q-gram set as a fixed-length bitvector}.  
+  \emph{This compact representation enables constant-time set operations using bitwise logic.}
+  
+  \item \textbf{Compute Jaccard similarity} between the query bitvector and each candidate's bitvector.  
+  \emph{This measures the proportion of shared q-grams while normalizing for different word lengths.}
+  
+  \item \textbf{Rank and select top candidates}, breaking ties with frequency rank and lexicographical order.  
+  \emph{This ensures stable, predictable results while favoring likely corrections.}
+\end{enumerate}}
+
+In the following section, each of the five steps of this algorithm would be detailed in pseudocode. \newline
+
+\purplebox{\subsection{Actual Algorithms}}
+For all intents and purposes, $q$ is defaulted to the value 2 for the following algorithms, since it allows for the most flexibility when autocorrecting, yet also allows the most fuzziness. However, $q > 2$ is still a theoretically possible algorithm, yet would not be something that has been thoroughly tested for practical accuracy. Here, $L$ is the register index length in bits, so $2^L$ is the number of possible positions of a block. Also, $\alpha$ is a parameter that determines how much the weighting of frequency ranking should factor into final score determination. \newline
+
+\pinkbox{Q-gram Extraction and Normalization}{
+  \begin{minipage}{\linewidth}
+    \begin{algorithmic}[1]
+      \Function{ExtractQgrams}{$w, q, fuzzier$}
+        \If{$|w| < q$} \State \Return $\emptyset$ \EndIf
+        \State $Q \gets [\,]$
+        \For{$i \gets 0$ to $|w|-q$}
+          \State $g \gets w[i:i+q]$
+          \State $Q$.\Call{append}{$g$}
+          \If{$q=2$}
+            \State $Q$.\Call{append}{$g$} \Comment{Duplicate exact bigrams (extra weight)}
+            \State $Q$.\Call{append}{$g[0]\mathbin{+\!}``\text{ }''$} \Comment{Left padded}
+            \State $Q$.\Call{append}{$``\text{ }''\mathbin{+\!}g[1]$} \Comment{Right padded}
+            \If{$fuzzier$} \State $Q$.\Call{append}{$g[1]g[0]$} \Comment{Adjacent swap} \EndIf
+          \EndIf
+        \EndFor
+        \State \Return $Q$
+      \EndFunction
+    \end{algorithmic}
+  \end{minipage}
+}
+
+\pinkbox{Sketch Construction (FQ-HLL Build)}{
+  \begin{minipage}{\linewidth}
+    \begin{algorithmic}[1]
+      \Function{BuildSketches}{$\mathcal{D}, b$} \Comment{$\mathcal{D}$: lowercased dict words}
+        \State $q \gets 2$
+        \State Initialize HLL config with precision $b$
+        \State $W \gets |\mathcal{D}|$
+        \State $NUM\_BUCKETS \gets 2^{\lceil \log_2(\sqrt{W}) \rceil}$ \Comment {Set bucket sizes $\approx$ square root of total word count}
+        \State $BUCKET\_SIZE \gets \lceil W / NUM\_BUCKETS \rceil$
+        \State $M \gets$ empty map ($g \mapsto$ HLL sketch)
+        \For{$i \gets 0$ to $W - 1$}
+          \State $w \gets \mathcal{D}[i]$
+          \State $bucket \gets \min(NUM\_BUCKETS,\; \lfloor (i+1)/BUCKET\_SIZE \rfloor + 1)$
+          \State $shift \gets \min(4 \cdot \lfloor \log_2(NUM\_BUCKETS / bucket) \rfloor,\; 2^L)$
+          \ForAll{$g \in \Call{ExtractQgrams}{w, q, \textbf{false}}$}
+            \If{$g \notin M$}
+              \State $M[g] \gets$ new HLL config with precision $b$
+            \EndIf
+            \State $key \gets g \mathbin{+\!} ``\_'' \mathbin{+\!} w$
+            \State $M[g]$.\Call{ShiftedInsert}{$key, shift$} \Comment{Simply insert $key$ with $\rho \gets \rho + shift$}
+          \EndFor
+        \EndFor
+        \State \Return $(M,\; NUM\_BUCKETS,\; BUCKET\_SIZE)$
+      \EndFunction
+    \end{algorithmic}
+  \end{minipage}
+}
+
+\pinkbox{Bitvector Encoding}{
+  \begin{minipage}{\linewidth}
+    \begin{algorithmic}[1]
+      \Function{BuildBitvectors}{$\mathcal{D}, R$}
+        \State $U \gets$ sorted list of all q-grams (keys of $M$) \Comment{Can be sorted in any replicable order}
+        \State $ID \gets$ map (q-gram $\mapsto$ index in $[0, |U|-1]$)
+        \State $blocks \gets \lceil |U| / 2^L \rceil$; $B \gets [\,]$ \Comment{Bitvectors parallel to $\mathcal{D}$}
+        \ForAll{$w \in \mathcal{D}$}
+          \State $bv \gets$ array of $blocks$ zeros
+          \ForAll{$g \in \Call{ExtractQgrams}{w, 2, \textbf{false}}$}
+            \If{$g \in ID$}
+              \State $bit \gets ID[g]$
+              \State $blk \gets bit >> L$ \Comment{Bits right-shift by $L$}
+              \State $off \gets bit \,\&\, (2^L - 1)$ \Comment{Bitwise AND}
+              \State $bv[blk] \gets bv[blk] ~|~ (1 << off)$ \Comment{Bits left-shift by $off$, bitwise OR}
+            \EndIf
+          \EndFor
+          \State append $bv$ to $B$
+        \EndFor
+        \State \Return $(U, ID, B)$
+      \EndFunction
+    \end{algorithmic}
+  \end{minipage}
+}
+
+\pinkbox{Scoring \& Candidate Selection (Top-1)}{
+  \begin{minipage}{\linewidth}
+    \begin{algorithmic}[1]
+      \Function{Suggest}{$query, \mathcal{D}, (U,ID,B), BUCKET\_SIZE, \alpha$}
+        \State $Q \gets$ set(\Call{ExtractQgrams}{$query, 2, \textbf{true}$})
+        \State $qb \gets$ zero bitvector of length $|U|$
+        \ForAll{$g \in Q$}
+          \If{$g \in ID$}
+            \State set bit $ID[g]$ in $qb$
+          \EndIf
+        \EndFor
+        \State $qb\_count \gets \sum\limits_{blk} \mathrm{popcount}(qb[blk])$
+        \State $J \gets$ empty map; \quad $R \gets$ empty map
+        \For{$i \gets 0$ to $|\mathcal{D}| - 1$}
+          \If{$\mathcal{D}[i]$ is removed} \textbf{continue} \EndIf
+          \State $inter \gets \sum\limits_{b} \mathrm{popcount}(B[i][b] ~\&~ qb[b])$ \Comment{Bitwise AND}
+          \If{$inter = 0$} \textbf{continue} \EndIf
+          \State $ones \gets \sum\limits_{b} \mathrm{popcount}(B[i][b])$
+          \State $uni \gets qb\_count + ones - inter$
+          \State $J[i] \gets \begin{cases} inter / uni, & uni > 0 \\ 0, & \text{else} \end{cases}$
+          \State $R[i] \gets 1 / \big(\lfloor (i+1)/BUCKET\_SIZE \rfloor + 1\big)$ \Comment{Bucket-ranked Zipf frequency}
+        \EndFor
+        \State $best \gets (-\infty, -1, -1)$
+        \ForAll{$\tau \in \{0.8, 0.7, 0.6, 0.5, 0.4\}$} \Comment{In practice, this range of checking is optimal}
+          \ForAll{$i$ with $J[i] \geq \tau$}
+            \State $lenPenalty \gets 1 - \big(\frac{|\,|\mathcal{D}[i]| - |query|\,|}{|query|}\big)^2$
+            \State $score \gets (J[i] + \alpha R[i]) \cdot lenPenalty + \mathbf{1}[\mathcal{D}[i] = query]$
+            \If{$score > best.score$}
+              \State $best \gets (score, i, \tau)$
+            \EndIf
+          \EndFor
+        \EndFor
+        \If{$best.i = -1$}
+          \State $best.i \gets \arg\max_i J[i]$; \quad $best.\tau \gets 0.4$
+        \EndIf
+        \State \Return $\mathcal{D}[best.i]$
+      \EndFunction
+    \end{algorithmic}
+  \end{minipage}
+}
+
+\pinkbox{Scoring \& Candidate Selection (Top-3)}{
+  \begin{minipage}{\linewidth}
+    \begin{algorithmic}[1]
+      \Function{TopThree}{$query, \mathcal{D}, (U,ID,B), BUCKET\_SIZE, \alpha$}
+        \State compute $J[i]$ and $R[i]$ as in \textsc{Suggest}
+        \State $base[i] \gets (J[i] + \alpha R[i]) \cdot \big(1 - \big(\frac{|\,|\mathcal{D}[i]| - |query|\,|}{|query|}\big)^2\big)$
+        \State $shortlist \gets$ indices of top 30 by $base[i]$ (desc)
+        \ForAll{$i$ in $shortlist$}
+          \State $final[i] \gets base[i] + \mathbf{1}[\mathcal{D}[i] = query]$
+        \EndFor
+        \State sort $final$ desc
+        \State emit first three \textbf{distinct} display strings (dedupe via display map), pad with ``'' if fewer
+        \State \Return list of up to 3 suggestions
+      \EndFunction
+    \end{algorithmic}
+  \end{minipage}
+}
+
+\vspace{1.0em}\purplebox{\subsection{Remark on Keyboard Layouts}}
+As the purpose of this FQ-HLL algorithm is to demonstrate autocorrection's success via FQ-HLL without the need of English or keyboard knowledge, the algorithms above do not account for the keyboard layout. However, when implementing it as an algorithm used in real life, perhaps this serves as useful information. \newline
+
+In this case, we introduce parameter $\beta$, which adjusts scores by adding $\boxed{\frac{\beta}{1 + \textsc{WordDist}(query, w_i)}}$ , where \textsc{WordDist} is computed based on Levenshtein distance via DP as follows: \newline
+
+\pinkbox{Edit Distance Function}{
+\begin{minipage}{\linewidth}
+\begin{algorithmic}[1]
+  \Function{WordDist}{$a, b$}
+    \State $m \gets |a|$; $n \gets |b|$
+    \State Create matrix $dp[0 \dots m][0 \dots n]$
+    \For{$i \gets 0$ to $m$} \State $dp[i][0] \gets i$ \EndFor
+    \For{$j \gets 0$ to $n$} \State $dp[0][j] \gets j$ \EndFor
+    \For{$i \gets 1$ to $m$}
+      \For{$j \gets 1$ to $n$}
+        \If{$a[i-1] = b[j-1]$}
+          \State $cost \gets 0$
+        \Else
+          \State $cost \gets$ \Call{CharDist}{$a[i-1], b[j-1]$} \Comment{\textsc{CharDist} is Manhattan distance}
+        \EndIf
+        \State $dp[i][j] \gets \min\{ dp[i-1][j] + 1,\ dp[i][j-1] + 1,\ dp[i-1][j-1] + cost \}$
+      \EndFor
+    \EndFor
+    \State \Return $dp[m][n]$
+  \EndFunction
+\end{algorithmic}
+\end{minipage}
+}
+
+\newpage
+\vspace{1.0em}\bluebox{\section{Experimental Results}}
+
+We evaluate FQ-HLL autocorrection using the \texttt{typo\_file.txt} dataset derived from Peter Norvig's spelling corrector corpus\footnote{\url{https://www.kaggle.com/datasets/bittlingmayer/spelling/data}}, testing against two dictionary configurations:
+
+\begin{itemize}
+  \item \textbf{\texttt{database.txt}} --- Contains all intended correction words in original order (no frequency information).
+  \item \textbf{\texttt{20k\_shun4midx.txt}} --- The 20{,}000 most common English words\footnote{\url{https://github.com/first20hours/google-10000-english/blob/master/20k.txt}} placed before the words from \texttt{database.txt}, forcing intended corrections to be ranked lower by frequency bias, and thus disadvantaging the results.
+\end{itemize}
+
+Accuracy is defined strictly: a prediction is correct only if it exactly matches the intended target word. For example, for the typo ``mant'', even if our algorithm suggests ``many'', if the intended answer was ``want'', we still count it as wrong. We also measure \textbf{Top-3 accuracy}, where a prediction is counted correct if the intended word appears in the first three suggestions.
+
+\paragraph{Python Implementation}
+On \texttt{database.txt}, FQ-HLL achieved \textbf{87-88\%} Top-1 accuracy and \textbf{93-94\%} Top-3 accuracy, with total runtime $0.223$\,s. On \texttt{20k\_shun4midx.txt}, accuracy dropped to \textbf{59-60\%} (Top-1) and \textbf{75-76\%} (Top-3) with runtime $9.955$\,s. \newline
+
+For comparison, a BK-tree with Levenshtein edit distance $\leq 2$ scored \textbf{75-76\%} (Top-1) and \textbf{43-44\%} (Top-3) but was over $5\times$ slower and had a lower accuracy. Even at edit distance $\leq 3$, BK-tree accuracy rose modestly to \textbf{89-90\%} (Top-1) but remained slower than FQ-HLL. SymSpell (edit distance $\leq 5$) achieved similar accuracy to BK-tree but required separate build and query phases. The SymSpell times are displayed assign Build + Query time.
+
+\begin{center}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Method} & \texttt{database.txt} & \texttt{20k\_shun4midx.txt} \\
+    \midrule
+    FQ-HLL & 0.223\,s & 9.955\,s \\
+    BK-tree (ED $\leq 2$) & 2.126\,s & 46.028\,s \\
+    BK-tree (ED $\leq 3$) & 3.816\,s & 92.812\,s \\
+    SymSpell & 0.515\,s + 0.996\,s & 16.994\,s + 29.355\,s \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\paragraph{C++ Implementation}
+C++ FQ-HLL produced identical accuracy to Python but with significantly faster runtimes: $0.071$\,s (\texttt{database.txt}) and $2.649$\,s (\texttt{20k\_shun4midx.txt}) for Top-1; $0.084$\,s and $3.716$\,s for Top-3.
+
+\paragraph{Remark on Keyboard-Aware Mode}
+We optionally incorporate keyboard layout distance into the scoring function. On \texttt{20k\_shun4midx.txt}, this increases accuracy to \textbf{64-65\%} (Top-1) and \textbf{80-81\%} (Top-3) with only $\sim$1\,s additional runtime. However, the core results above are layout-agnostic, demonstrating FQ-HLL's strength without keyboard-specific information. \newline
+
+\bluebox{\section{Workarounds --- Amortized $O(1)$ Addition and Deletion}}
+% Deletion or smth and also the O(1) addition/deletion and its caveats with save_dictionary()
+Although it is technically possible to create a new sketch every time we add or remove an element in the dictionary, this is not so convenient, and we require a low time and memory overhead method to do so to maintain the advantage of FQ-HLL. Upon careful inspection of the algorithms, we realize that the addition of words can be simply done by adding onto certain maps, if the register exponent $\lfloor \log_2 (NUM\_BUCKETS) \rfloor$ remains unchanged. In the case where it differs, then we can rebuild everything. Similarly, this logic can be applied to deletion. We may not be able to fully delete from a sketch due to limitations by HLL, but by blocking words to be unable to appear as suggestions, it functionally is almost the same as deletion. If we rebuild often enough, it would not be too big of a difference in sketch values. \newline
+
+Thus, we can use the following algorithms to maintain addition and deletion without needing costly rebuilds of sketches each time. In fact, they are amortized $O(1)$, because addition would occur $o(n)$ times, yet rebuild takes maximum $O(n)$, and otherwise, the operations are done in $O(1)$. For subtraction, if we set a certain threshold $t \in [0, 1)$, and rebuild after $t\times$ the original size of words are removed (by keeping track of the words removed), that means we compute an $O(n)$ operation for every $t \cdot n$ words removed. \newline
+
+\pinkbox{Addition to Dictionary}{
+  \begin{algorithmic}[1]
+    \Function{AddDictionary}{$\mathcal{D}, W_{\text{new}}, b,\ M, U, ID, B,\ NUM\_BUCKETS,\ BUCKET\_SIZE$}
+      \State $A \gets$ words in $W_{\text{new}}$ not already in $\mathcal{D}$ (after validation/lowercasing)
+      \If{$|A| = 0$}
+        \State \Return{\textit{unchanged}}
+      \EndIf
+      \State $old\_exp \gets \log_2(NUM\_BUCKETS)$
+      \State $new\_exp \gets \left\lceil \dfrac{\log_2(|\mathcal{D}| + |A|)}{2} \right\rceil$
+      \If{$new\_exp \neq old\_exp$}
+        \State append $A$ to $\mathcal{D}$ (and update display/sets)
+        \State \Return{\Call{RebuildDictionary}{$\mathcal{D}, \varnothing, b$}}
+      \EndIf
+      \State $NUM\_BUCKETS \gets \left\lceil \dfrac{|\mathcal{D}| + |A|}{BUCKET\_SIZE} \right\rceil$ \Comment{keep $BUCKET\_SIZE$ fixed}
+      \State $base \gets |\mathcal{D}|$
+      \For{$i \gets 0$ to $|A|-1$}
+        \State $w \gets A[i]$; append $w$ to $\mathcal{D}$ (and update display/sets)
+        \State $bucket \gets \min\!\Big(NUM\_BUCKETS,\ \left\lfloor \dfrac{base+i+1}{BUCKET\_SIZE} \right\rfloor + 1\Big)$
+        \State $shift \gets \min\!\Big(4 \cdot \big\lfloor \log_2(\tfrac{NUM\_BUCKETS}{bucket}) \big\rfloor,\ \textsc{ShiftCap}\Big)$
+        \ForAll{$g \in \Call{ExtractQgrams}{w, 2,\ \textbf{false}}$}
+          \If{$g \notin M$}
+            \State $M[g] \gets$ new HLL($b$)
+          \EndIf
+          \State $key \gets (g + ``\texttt{\_}'' + w)$
+          \State $M[g].$\Call{ShiftedInsert}{$key,\ shift$}
+        \EndFor
+      \EndFor
+      \State $newU \gets$ sorted keys of $M$
+      \If{$|newU| > |U|$} \Comment{new q-grams appeared}
+        \State extend every bitvector in $B$ with zero blocks to length $|newU|$
+        \State $U \gets newU$; recompute $ID$ (q-gram $\mapsto$ index)
+      \EndIf
+      \For{$\,$each newly added $w$}
+        \State build bitvector by setting $ID[g]$ for $g \in \Call{ExtractQgrams}{w,2,\textbf{false}}$; append to $B$
+      \EndFor
+      \State \Return{\textit{updated structures}}
+    \EndFunction
+  \end{algorithmic}
+}
+
+\pinkbox{Deletion from Dictionary}{
+  \begin{algorithmic}[1]
+    \Function{RemoveDictionary}{$\mathcal{D}, W_{\text{del}}, \mathcal{R}, t,\ b,\ M,\ U,\ ID,\ B$}
+      \ForAll{$w \in W_{\text{del}}$}
+        \If{$w \in \mathcal{D}$}
+          \State add $w$ to $\mathcal{R}$ \Comment{Logical delete}
+        \EndIf
+      \EndFor
+      \If{$|\mathcal{R}| \geq t \cdot |\mathcal{D}|$}
+        \State \Return{\Call{RebuildDictionary}{$\mathcal{D}, \mathcal{R}, b$}}
+      \Else
+        \State \Return{$(\textit{updated }\mathcal{R})$} \Comment{Other structures unchanged}
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+}
+
+\pinkbox{Rebuild Dictionary (Shared with both Addition and Deletion)}{
+  \begin{algorithmic}[1]
+    \Function{RebuildDictionary}{$\mathcal{D}, \mathcal{R}, b$}
+      \State $\mathcal{D} \gets \mathcal{D} \setminus \mathcal{R}$ \Comment{physically remove blocked words}
+      \State \textbf{reset} all sketches/maps
+      \State $(M,\ NUM\_BUCKETS,\ BUCKET\_SIZE) \gets \Call{BuildSketches}{\mathcal{D}, b}$
+      \State $(U,\ ID,\ B) \gets \Call{BuildBitvectors}{\mathcal{D}, M}$ \Comment{q-gram universe, index map, bitvectors}
+      \State $\mathcal{R} \gets \varnothing$
+      \State \Return $(\mathcal{D}, \mathcal{R}, M, U, ID, B,\ NUM\_BUCKETS,\ BUCKET\_SIZE)$
+    \EndFunction
+  \end{algorithmic}
+}
+
+\vspace{1.0em}\bluebox{\section{Future Developments with Local Differential Privacy}}
+
+A huge part of the inspiration for this work was based on the paper \cite{vbk22}, which detailed an algorithm that contained fuzziness, efficiency, and (local differential) privacy. This was because the mainstream methods of autocorrection such as Apple's CMS (Count-Min Sketch) only had efficiency and fuzziness, whereas Google's RAPPOR (Randomized Aggregatable Privacy-Preserving
+Ordinal Response) only had efficiency and privacy, so they wanted to create an algorithm that contained all three. \newline
+
+This work's ultimate goal for FQ-HLL autocorrection is to also contain all three, which was what raised the interest with how to incorporate Local Differential Privacy (LDP) in this algorithm. \newline
+
+\purplebox{\subsection{Definition}}
+\pinkbox{Definition of DP}{Introduced in the paper \cite{dwo06}, differential privacy ensures that the inclusion or exclusion of a single individual's data does not significantly affect the output of a randomized algorithm. \newline
+
+Formally, for any two neighboring datasets $D$ and $D'$ differing in at most one record with $D \subseteq D'$, and for any subset of outputs $S \subseteq \text{Range}(\mathcal{A})$, a randomized algorithm $\mathcal{A}$ satisfies $\varepsilon$-differential privacy if:
+\[
+\Pr[\mathcal{A}(D) \in S] \leq e^\varepsilon \cdot \Pr[\mathcal{A}(D') \in S] 
+\]
+
+where $\varepsilon > 0$ is the privacy budget. A smaller $\varepsilon$ implies stronger privacy, as it limits the algorithm's sensitivity to individual records}
+
+\pinkbox{Definition of LDP}{
+  In decentralized settings, LDP provides per-user privacy by requiring the randomization to be applied before data leaves the user's device. A mechanism $\mathcal{A}: \mathcal{X} \to \mathcal{Y}$ satisfies $\varepsilon$-LDP if for all $x, x' \in \mathcal{X}$ and $y \in \mathcal{Y}$,
+  \[
+  \Pr[\mathcal{A}(x) = y] \leq e^\varepsilon \cdot \Pr[\mathcal{A}(x') = y]
+  \]
+}
+
+\vspace{1.0em}\purplebox{\subsection{LDP within FQ-HLL Autocorrection --- Temporary Progress}}
+
+Despite promising results from amortized constant-time addition and deletion, in practice the suggested results of typos seem to be at a slightly lower accuracy, albeit still acceptable. This is likely due to an implementation bug rather than a fundamental issue with the algorithm. As such, even with two plausible ideas for LDP in FQ-HLL, I have not yet pushed a working implementation. In this section, I detail the intuition and proof for the idea of replacing certain reported q-grams with random q-grams to achieve LDP. \newline
+
+\pinkbox{Mechanism (Unary Randomized Response on q-gram presence)}{
+Formally, fix an ordered q-gram universe $U = \{g_1, \dots, g_m\}$.
+Given a client set $S \subseteq U$, encode $v \in \{0, 1\}^m$ with $v_j = \mathbf{1}[g_j \in S]$.
+Independently for each coordinate $j$, output $\tilde v_j \in \{0, 1\}$ as
+\[
+\Pr[\tilde v_j = 1 \mid v_j = 1] = p,\quad
+\Pr[\tilde v_j = 1 \mid v_j = 0] = q,\quad
+\Pr[\tilde v_j = 0 \mid v_j = \cdot] = 1 - \Pr[\tilde v_j = 1 \mid v_j = \cdot],
+\]
+with the standard $\varepsilon$-LDP choice
+\[
+p = \frac{e^{\varepsilon}}{e^{\varepsilon} + 1}, \qquad q = \frac{1}{e^{\varepsilon} + 1}.
+\]
+(Optionally cap $|S|\leq K$ or sample a subset of coordinates to control composition.)
+}
+
+\pinkbox{Theorem (Per-bit $\varepsilon$-LDP)}{
+For each coordinate $j$, the above mechanism satisfies $(\varepsilon, 0)$-local differential privacy.
+}
+
+\noindent \textit{Proof.}
+Fix $j$ and any two inputs $v_j, v'_j \in \{0, 1\}$ and any output $y \in \{0, 1\}$.
+We must show $\frac{\Pr[\tilde v_j = y \mid v_j]}{\Pr[\tilde v_j = y \mid v'_j]} \leq e^{\varepsilon}$.
+
+\noindent If $y = 1$:
+\[
+\frac{\Pr[\tilde v_j = 1 \mid v_j = 1]}{\Pr[\tilde v_j = 1 \mid v_j = 0]} = \frac{p}{q}
+=\frac{\tfrac{e^{\varepsilon}}{e^{\varepsilon} + 1}}{\tfrac{1}{e^{\varepsilon} + 1}}=e^{\varepsilon}.
+\]
+If $y = 0$:
+\[
+\frac{\Pr[\tilde v_j = 0 \mid v_j = 1]}{\Pr[\tilde v_j = 0 \mid v_j = 0]}
+=\frac{1 - p}{1 - q}
+=\frac{\tfrac{1}{e^{\varepsilon} + 1}}{\tfrac{e^{\varepsilon}}{e^{\varepsilon} + 1}}=e^{-\varepsilon}\leq e^{\varepsilon}.
+\]
+Thus, the likelihood ratio is at most $e^{\varepsilon}$ in all cases, proving $(\varepsilon, 0)$-LDP. \qed
+
+\pinkbox{Lemma (Unbiased frequency estimation)}{
+Let $N$ be the number of reports and, for a fixed $j$, let
+\[
+\tilde c_j = \sum_{i = 1}^N \tilde v^{(i)}_j
+\]
+be the \emph{observed privatized count} of 1's after applying the randomized response mechanism. Let
+\[
+c_j = \sum_{i = 1}^N v^{(i)}_j
+\]
+be the (unobserved) true count, and $f(g_j) = \frac{c_j}{N}$ its true frequency.
+Then the unbiased estimators are
+\[
+\widehat{c}_j = \frac{\tilde c_j - Nq}{p - q},\qquad
+\widehat{f}(g_j) = \frac{\widehat{c}_j}{N} = \frac{\frac{\tilde c_j}{N} - q}{p-q}.
+\]
+}
+
+\noindent \textit{Proof.}
+Let $\theta_j = \Pr[v_j = 1]$. For a single report,
+\[
+\mathbb{E}[\tilde v_j] = p\cdot \theta_j + q \cdot (1 - \theta_j) = q + (p - q)\theta_j.
+\]
+
+Summing over $N$ independent reports gives $\mathbb{E}[\tilde c_j] = N \big(q + (p - q) \theta_j \big)$.
+Solving for $\theta_j$ yields the stated estimator with $\mathbb{E}[\widehat{f}(g_j) ]= \theta_j = f(g_j)$. \qed \newline
+
+\pinkbox{Variance}{
+Let $\theta_j = f(g_j)$. For one report,
+\[
+\operatorname{Var}(\tilde v_j) =
+\underbrace{\theta_j\, p(1 - p) + (1 - \theta_j)\, q(1 - q)}_{\mathbb{E}[\operatorname{Var}(\tilde v_j \mid v_j)]}
++ \underbrace{\theta_j(1 - \theta_j)(p - q)^2}_{\operatorname{Var}(\mathbb{E}[\tilde v_j \mid v_j])}.
+\]
+Hence
+\[
+\operatorname{Var}\big(\widehat{f}(g_j)\big)
+=\frac{1}{N} \cdot \frac{\operatorname{Var}(\tilde v_j)}{(p - q)^2}.
+\]
+As $N$ grows, variance shrinks at rate $\frac{1}{N}$; for fixed $\varepsilon$, larger $(p-q)$ improves accuracy.
+}
+
+\pinkbox{Composition and post-processing}{
+Reporting multiple coordinates composes additively in $\varepsilon$ under independence; in practice we cap $|S|$ or subsample coordinates per report to bound total privacy loss. Any server-side computation (debiasing, bucketization, updating $s(\cdot)$) is a post-processing of the privatized data and cannot weaken privacy.
+}
+
+\vspace{1.0em}\bluebox{\section{Future Scalability}} % 
+With its low memory footprint and $O(1)$ update/query time, FQ-HLL autocorrection is well suited for many real-life scenarios, especially in both embedded and distributed systems. \newline
+
+In a distributed setting, FQ-HLL can directly exploit the \textbf{mergeability} property of HLL: each device can maintain its own set of per q-gram sketches (with frequency shifts applied as usual), and these can be merged in $O(m)$ time, where $m$ is the number of registers. This allows work to be split across devices and recombined without loss of accuracy. \newline
+
+Such merging is also valuable for cloud-backed applications: a user's device can periodically upload its local sketches, which the server can merge into a global model. This avoids the need to rebuild or reinsert the entire dictionary, enabling incremental, bandwidth-efficient updates. Most importantly, it still has natural obfuscation from HLL only counting q-grams, and could even maintain LDP if algorithms from Section 6 are implemented, which is a great way to maintain privacy. \newline
+
+\bluebox{\section{Conclusion and Takeaways}}
+In conclusion, HyperLogLog is a space-efficient, fast, and easily mergeable data structure perfect for cardinality estimations. In this work, we investigated how HLL can be a promising direction towards seeing autocorrection in a new light, allowing for a significant runtime decrease with acceptable accuracy. \newline 
+
+We investigated how frequency quantization can be added natively within HLL, which is originally thought to be only a cardinality estimator, to create an equally memory and time efficient FQ-HLL. Notably, by viewing ``autocorrection'' in a new light similar to how dyslexic people process words, we were able to utilize HLL for language processing. This suggests a new possible usage of data sketching to handle NLP-adjacent problems. \newline 
+
+Furthermore, future work suggests a promising possibility that LDP can be done on HLL natively. Perhaps, in today's world where privacy is increasingly-valued, FQ-HLL autocorrection could be used in place of current autocorrection algorithms. Such an approach may eliminate the need to store large amounts of data in a central system, yet maintain privacy, suggesting a very promising privacy-preserving autocorrection suitable in distributed and embedded systems with high speed. \newline
+
+\printbibliography[heading=blueboxed]
+
+\pinkbox{Acknowledgements}{Some definitions in Section 1, 2, and 6 of this algorithm description are adapted from the final project for Advanced Data Structures (2025), which I co-authored with my group members. I would like to thank my then team member for their contribution to those definitions.}
+
+\end{document}
