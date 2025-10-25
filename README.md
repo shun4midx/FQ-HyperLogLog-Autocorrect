@@ -1,6 +1,17 @@
 # Frequency-Quantized HyperLogLog Autocorrect 
 <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B"><a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
+# IMPORTANT NOTE: 
+**Since time has passed, I found a bug in my algorithm that makes it still have real-world accuracy but is not-so FQ-HLL dependent anymore. Over the winter holiday from December 2025 to February 2026, I plan to develop a new autocorrection algorithm using other data sketching tools, but please keep that in mind.** 
+
+**I will still refer to this as an "FQ-HLL" algorithm, and it did use FQ-HLL, but I later found it unnecessary, so please treat the theoretical algorithm writeup with a grain of salt, although the experimental results still hold true. Please forgive me for my mistakes here, since I was still a sophomore student when I created the project on FQ-HLL Autocorrection, and this was my first big algorithm project I actually had.** 
+
+**I will not modify the names of any other projects that used this algorithm, which I named after FQ-HLL, but I probably would unpin those and pin their newer variants using a new data sketching autocorrection algorithm when they are out, on my main profile. Feel free to still use my code here for normal autocorrection usage, but not for theoretical accuracy.**
+
+**Thank you,**
+
+**Shun/翔海 (@shun4midx)**
+
 ## NOTE: Specific details on how to install and run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately, and more information about the actual algorithm is in `algo_description/description.pdf`
 
 ## NOTE 2: More detailed documentation for the actual libraries is coming soon. Please give me time.
