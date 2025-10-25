@@ -3,7 +3,7 @@
 
 ## NOTE: Specific details on how to install and run the programs in Python and C++ are in the `fq_hll_py` and `fq_hll_cpp` folders separately, and more information about the actual algorithm is in `algo_description/description.pdf`
 
-## NOTE 2: More detailed documentation fro the actual libraries is coming soon. Please give me time.
+## NOTE 2: More detailed documentation for the actual libraries is coming soon. Please give me time.
 
 An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library based on my final project in **Advanced Data Structures 2025**, with credit to my team members at the time. For respect of their privacy, I would keep them anonymous, unless they request otherwise.
 
@@ -79,7 +79,7 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
 
 ## Current Repos using this FQ-HLL Library
  <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B">
- - `FQ-HLL Keyboard`: An Android mobile keyboard that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development with [Ducky](https://github.com/ducky4life). The GitHub link will be provided once available.
+ - `FQ-HLL Keyboard`: [An Android mobile keyboard](https://github.com/shun4midx/FQ-HLL-Keyboard) that integrates this FQ-HLL autocorrect library. It serves as a semi-official real-world use case for the algorithm alongside this specific library, and I am beyond honored to be a part of its development with [Ducky](https://github.com/ducky4life). The GitHub link will be provided once available.
  - `FQ-HLL Bot`: A [C++ Discord bot](https://github.com/shun4midx/FQ-HLL-Bot) which is the semi-official real-world use case for this algorithm displayed as a Discord bot for convenience of testing.
 
  <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
