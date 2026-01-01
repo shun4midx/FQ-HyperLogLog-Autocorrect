@@ -1,14 +1,12 @@
 # Frequency-Quantized HyperLogLog Autocorrect 
 <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B"><a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
-# IMPORTANT NOTE: 
-**Since time has passed, I found a bug in my algorithm that makes it still have real-world accuracy but is not-so FQ-HLL dependent anymore. Over the winter holiday from December 2025 to February 2026, I plan to develop a new autocorrection algorithm using other data sketching tools, but please keep that in mind.** 
+# Note (Jan 1 2026):
+**While revisiting this project, as visible from past commits, I briefly questioned whether HyperLogLog was essential to the algorithm’s behavior. Further analysis showed that this concern was overstated: FQ-HLL Autocorrection does not rely on Frequency-Quantized HyperLogLog as a standalone estimator, but uses it intentionally as a sketch-based bias and stabilization mechanism alongside deterministic fuzzy q-gram matching.**
 
-**I will still refer to this as an "FQ-HLL" algorithm, and it did use FQ-HLL, but I later found it unnecessary, so please treat the theoretical algorithm writeup with a grain of salt, although the experimental results still hold true. Please forgive me for my mistakes here, since I was still a sophomore student when I created the project on FQ-HLL Autocorrection, and this was my first big algorithm project I actually had.** 
+**The algorithm remains valid as implemented, and its empirical results continue to hold in practical usage. I am not replacing or discontinuing FQ-HLL at this time. Any future sketch-based explorations will be developed as separate projects.**
 
-**I will not modify the names of any other projects that used this algorithm, which I named after FQ-HLL, but I probably would unpin those and pin their newer variants using a new data sketching autocorrection algorithm when they are out, on my main profile. Feel free to still use my code here for normal autocorrection usage, but not for theoretical accuracy.**
-
-**Thank you,**
+**Thank you for all your support for the FQ-HLL project, which means a lot to me, and is one of the works I'm still the most proud of to this day.**
 
 **Shun/翔海 (@shun4midx)**
 
