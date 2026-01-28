@@ -1,7 +1,7 @@
 # Frequency-Quantized HyperLogLog Autocorrect 
 <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_cpp"><img src="https://img.shields.io/badge/c++-%23f34b7d.svg?style=for-the-badge&logo=c%2B%2B"><a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
-# Note (Jan 1 2026):
+# Note (Jan 1, 2026):
 **While revisiting this project, as visible from past commits, I briefly questioned whether HyperLogLog was essential to the algorithm’s behavior. Further analysis showed that this concern was overstated: FQ-HLL Autocorrection does not rely on Frequency-Quantized HyperLogLog as a standalone estimator, but uses it intentionally as a sketch-based bias and stabilization mechanism alongside deterministic fuzzy q-gram matching.**
 
 **The algorithm remains valid as implemented, and its empirical results continue to hold in practical usage. I am not replacing or discontinuing FQ-HLL at this time. Any future sketch-based explorations will be developed as separate projects.**
