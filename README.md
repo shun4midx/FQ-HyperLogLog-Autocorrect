@@ -94,8 +94,7 @@ Personally, I've always had an interest in autocorrect because I'm dyslexic and 
  <a href="https://github.com/shun4midx/FQ-HyperLogLog-Autocorrect/tree/main/fq_hll_py"><img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge">
 
  - `smortie`: A [discord.py music bot](https://github.com/ducky4life/smortie) which uses FQ-HLL autocorrect to deal with [search queries](https://github.com/ducky4life/smortie/blob/main/music.py#L144), in order to play songs.
- - `Web autocorrector`: An [autocorrector website](https://web-autocorrector.vercel.app/) which uses FQ-HLL autocorrect to deal with inputs
- - `klofr`: A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL that autocorrects every word in each message
+ - `klofr`: A [discord.py bot interface](https://github.com/ducky4life/klofr) for FQ-HLL (and [HLLPP](https://github.com/shun4midx/HyperLogLogPlusPlus-Autocorrect)) that autocorrects every word in each message
 
 ## License
 MIT License, reference `LICENSE` for more information.
