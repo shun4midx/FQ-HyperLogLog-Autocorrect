@@ -26,11 +26,11 @@ An improved Frequency-Quantized HyperLogLog (FQ-HLL) Autocorrection Library base
 - [License](#license)
 
 ## Context
+**For theoretical value, there is nothing in my algorithm that uses any information about the English language or the QWERTY keyboard, to do any of the corrections. It is a NON-ML algorithm too.**
+
 For context, we did Autocorrection for our final project, and I was tasked to design an Autocorrection algorithm using HLL. HLL demonstrated decent performance (accuracy, speed, and memory) compared to the [baseline](https://arxiv.org/pdf/2208.05264) with preliminary trials, but in our evaluation, we realized the way our algorithm didn't give HLL a fair chance. 
 
 After the semester, I doubt my team members have much interest, but I still have some interest in improving it to see how HLL would perform if given a fair chance. Hence, I propose adjusting HLL's naive distinct object counter to be Frequency-Quantized, resulting in an algorithm with "FQ-HLL". I have also refactored the algorithm quite a bit when doing so, to increase accuracy.
-
-**For theoretical value, there is nothing in my algorithm that uses any information about the English language or the QWERTY keyboard, to do any of the corrections. It is a NON-ML algorithm too.**
 
 ## Results
 I've referenced [a list of common typos in datasets from Peter Norvig's classic spelling corrector](https://www.kaggle.com/datasets/bittlingmayer/spelling/data), which I should call the `typo_file.txt`, and used FQ-HLL with two different sets of base "dictionary words". As I don't have access to the correct words in `typo_file.txt`'s relative frequencies, I simply put all the corresponding words in the order as they were given, and put it in a set of dictionary words: `database.txt`. 
